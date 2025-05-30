@@ -1,0 +1,646 @@
+{%- comment -%}
+  Professional Product Variant Meta Display
+  - Shows resolution, duration, and file info for each variant
+  - Clean, trustworthy design for video marketplace
+  - Auto-updates when variant selection changes
+{%- endcomment -%}
+
+{%- liquid
+  assign has_variants = false
+  if product.variants.size > 1
+    assign has_variants = true
+  endif
+  
+  assign has_duration = product.metafields.custom.video_duration_.value
+  assign has_resolutions = product.metafields.custom.video_resolutions.value
+  assign has_subtitle = product.metafields.descriptors.subtitle.value
+  
+  comment
+    Parse arrays for variant mapping
+  endcomment
+  assign duration_array = ''
+  assign resolution_array = ''
+  
+  if has_duration
+    assign duration_raw = has_duration | remove: '[' | remove: ']' | remove: '"' | split: ','
+  endif
+  
+  if has_resolutions
+    assign resolution_raw = has_resolutions | remove: '[' | remove: ']' | remove: '"' | split: ','
+  endif
+-%}
+
+{%- if has_variants or has_duration or has_resolutions -%}
+<div class="professional-product-meta" id="ProductMeta-{{ section.id | default: 'main' }}">
+  
+  {%- if has_subtitle -%}
+  <div class="product-subtitle">
+    <span class="subtitle-text">{{ has_subtitle }}</span>
+  </div>
+  {%- endif -%}
+  
+  {%- if has_variants -%}
+  <div class="variant-specs-container">
+    <h3 class="specs-title">Video Specifications</h3>
+    
+    <div class="variant-cards-grid">
+      {%- for variant in product.variants -%}
+        {%- assign variant_index = forloop.index0 -%}
+        
+        <div class="variant-card{% if forloop.first %} active{% endif %}" 
+             data-variant-id="{{ variant.id }}" 
+             data-variant-index="{{ variant_index }}">
+          
+          <div class="variant-header">
+            <h4 class="variant-title">
+              {%- if variant.title contains 'HD' or variant.title contains '1920' -%}
+                Horizontal Variant #{{ forloop.index }}
+              {%- elsif variant.title contains '4K' or variant.title contains '3840' -%}
+                Horizontal Variant #{{ forloop.index }} (4K)
+              {%- elsif variant.title contains 'Vertical' or variant.title contains 'Portrait' -%}
+                Vertical Variant #{{ forloop.index }}
+              {%- else -%}
+                {{ variant.title }}
+              {%- endif -%}
+            </h4>
+            <span class="variant-price">{{ variant.price | money }}</span>
+          </div>
+          
+          <div class="variant-summary">
+            {%- assign duration_value = '' -%}
+            {%- assign resolution_count = 0 -%}
+            {%- assign format_type = 'MP4' -%}
+            
+            {%- if has_duration and duration_raw.size > variant_index -%}
+              {%- assign duration_seconds = duration_raw[variant_index] | strip | plus: 0 -%}
+              {%- if duration_seconds > 0 -%}
+                {%- if duration_seconds >= 60 -%}
+                  {%- assign minutes = duration_seconds | divided_by: 60 -%}
+                  {%- assign seconds = duration_seconds | modulo: 60 -%}
+                  {%- assign duration_value = minutes | append: 'm ' | append: seconds | append: 's' -%}
+                {%- else -%}
+                  {%- assign duration_value = duration_seconds | append: ' Seconds' -%}
+                {%- endif -%}
+              {%- endif -%}
+            {%- endif -%}
+            
+            {%- if has_resolutions and resolution_raw.size > variant_index -%}
+              {%- assign resolution_data = resolution_raw[variant_index] | strip -%}
+              {%- if resolution_data != blank -%}
+                {%- assign formats = resolution_data | split: ' + ' -%}
+                {%- assign resolution_count = formats.size -%}
+              {%- endif -%}
+            {%- endif -%}
+            
+            <p class="variant-description">
+              {%- if duration_value != blank -%}{{ duration_value }}{%- endif -%}
+              {%- if duration_value != blank and resolution_count > 0 -%}, in {%- endif -%}
+              {%- if resolution_count > 0 -%}{{ resolution_count }} Resolution{{ resolution_count | pluralize: '', 's' }} ({{ format_type }}){%- endif -%}
+            </p>
+          </div>
+          
+          <div class="variant-specs-detailed">
+            {%- if has_duration and duration_raw.size > variant_index -%}
+              {%- assign duration_seconds = duration_raw[variant_index] | strip | plus: 0 -%}
+              {%- if duration_seconds > 0 -%}
+              <div class="spec-row">
+                <svg class="spec-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <circle cx="12" cy="12" r="10"/>
+                  <polyline points="12,6 12,12 16,14"/>
+                </svg>
+                <span class="spec-text">
+                  <strong>Duration:</strong> 
+                  {%- if duration_seconds >= 60 -%}
+                    {%- assign minutes = duration_seconds | divided_by: 60 -%}
+                    {%- assign seconds = duration_seconds | modulo: 60 -%}
+                    {{ minutes }}m {{ seconds }}s
+                  {%- else -%}
+                    {{ duration_seconds }} seconds
+                  {%- endif -%}
+                </span>
+              </div>
+              {%- endif -%}
+            {%- endif -%}
+            
+            {%- if has_resolutions and resolution_raw.size > variant_index -%}
+              {%- assign resolution_data = resolution_raw[variant_index] | strip -%}
+              {%- if resolution_data != blank -%}
+              <div class="spec-row">
+                <svg class="spec-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <rect x="2" y="4" width="20" height="16" rx="2"/>
+                  <path d="m22,6l-10,6L2,6"/>
+                </svg>
+                <span class="spec-text">
+                  <strong>Resolutions:</strong> {{ resolution_data | replace: ' + ', ', ' | replace: '(MP4)', '' | strip }}
+                </span>
+              </div>
+              
+              <div class="spec-row">
+                <svg class="spec-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+                </svg>
+                <span class="spec-text">
+                  <strong>Format:</strong> MP4 (H.264)
+                </span>
+              </div>
+              {%- endif -%}
+            {%- endif -%}
+          </div>
+          
+          {%- if variant.available -%}
+            <div class="variant-status available">
+              <svg class="status-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M9,20.42L2.79,14.21L5.62,11.38L9,14.77L18.88,4.88L21.71,7.71L9,20.42Z"/>
+              </svg>
+              <span>Available</span>
+            </div>
+          {%- else -%}
+            <div class="variant-status unavailable">
+              <svg class="status-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+              </svg>
+              <span>Out of Stock</span>
+            </div>
+          {%- endif -%}
+        </div>
+      {%- endfor -%}
+    </div>
+  </div>
+  {%- else -%}
+    {%- comment -%} Single variant display {%- endcomment -%}
+    {%- if has_duration or has_resolutions -%}
+    <div class="single-variant-specs">
+      <h3 class="specs-title">Video Specifications</h3>
+      
+      <div class="specs-grid">
+        {%- if has_duration and duration_raw.size > 0 -%}
+          {%- assign duration_seconds = duration_raw[0] | strip | plus: 0 -%}
+          {%- if duration_seconds > 0 -%}
+          <div class="spec-card">
+            <div class="spec-icon-wrapper">
+              <svg class="spec-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12,6 12,12 16,14"/>
+              </svg>
+            </div>
+            <div class="spec-content">
+              <span class="spec-label">Duration</span>
+              <span class="spec-value">
+                {%- if duration_seconds >= 60 -%}
+                  {%- assign minutes = duration_seconds | divided_by: 60 -%}
+                  {%- assign seconds = duration_seconds | modulo: 60 -%}
+                  {{ minutes }}m {{ seconds }}s
+                {%- else -%}
+                  {{ duration_seconds }}s
+                {%- endif -%}
+              </span>
+            </div>
+          </div>
+          {%- endif -%}
+        {%- endif -%}
+        
+        {%- if has_resolutions and resolution_raw.size > 0 -%}
+          {%- assign resolution_data = resolution_raw[0] | strip -%}
+          {%- if resolution_data != blank -%}
+          <div class="spec-card">
+            <div class="spec-icon-wrapper">
+              <svg class="spec-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <rect x="2" y="4" width="20" height="16" rx="2"/>
+                <path d="m22,6l-10,6L2,6"/>
+              </svg>
+            </div>
+            <div class="spec-content">
+              <span class="spec-label">Quality & Format</span>
+              <div class="quality-badges">
+                {%- assign formats = resolution_data | split: ' + ' -%}
+                {%- for format in formats -%}
+                  {%- assign clean_format = format | strip -%}
+                  {%- if clean_format contains '4K' or clean_format contains '3840' -%}
+                    <span class="quality-tag tag-4k">4K</span>
+                  {%- elsif clean_format contains '1920' or clean_format contains '1080' -%}
+                    <span class="quality-tag tag-hd">HD</span>
+                  {%- endif -%}
+                  
+                  {%- if clean_format contains 'MP4' -%}
+                    <span class="format-tag">MP4</span>
+                  {%- endif -%}
+                {%- endfor -%}
+              </div>
+            </div>
+          </div>
+          {%- endif -%}
+        {%- endif -%}
+      </div>
+    </div>
+    {%- endif -%}
+  {%- endif -%}
+</div>
+
+<style>
+.professional-product-meta {
+  margin: 2rem 0;
+  padding: 0;
+  position: relative;
+  z-index: 1;
+  clear: both;
+}
+
+/* When rendered within title block */
+.product__title .professional-product-meta {
+  margin: 1.5rem 0 0 0 !important;
+  padding-top: 1.5rem !important;
+  border-top: 1px solid #e5e7eb !important;
+}
+
+/* Ensure separation from title */
+.product__title + .professional-product-meta {
+  margin-top: 2.5rem !important;
+  padding-top: 1rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.product-subtitle {
+  margin-bottom: 1.5rem;
+}
+
+.subtitle-text {
+  font-size: 1.1rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.specs-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 1.5rem 0;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid #e5e7eb;
+  position: relative;
+}
+
+.specs-title::before {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 60px;
+  height: 2px;
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+}
+
+/* Multi-variant layout */
+.variant-specs-container {
+  margin-top: 1rem;
+}
+
+.variant-cards-grid {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 768px) {
+  .variant-cards-grid {
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  }
+}
+
+.variant-card {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border: 2px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 1.5rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  margin: 0;
+}
+
+.variant-card.active {
+  border-color: #3b82f6;
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  box-shadow: 0 8px 30px rgba(59, 130, 246, 0.2);
+  transform: translateY(-2px);
+}
+
+.variant-card:hover:not(.active) {
+  border-color: #6366f1;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
+}
+
+.variant-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.variant-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+  line-height: 1.3;
+}
+
+.variant-price {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #059669;
+  white-space: nowrap;
+}
+
+.variant-summary {
+  margin-bottom: 1.25rem;
+}
+
+.variant-description {
+  font-size: 0.9rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.variant-specs-detailed {
+  margin-bottom: 1.25rem;
+}
+
+.spec-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.9rem;
+  padding: 0.5rem 0;
+}
+
+.spec-icon {
+  width: 18px;
+  height: 18px;
+  color: #6366f1;
+  flex-shrink: 0;
+  stroke-width: 2;
+}
+
+.spec-text {
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.resolution-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.quality-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.3rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.tag-4k {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  color: white;
+}
+
+.tag-hd {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  color: white;
+}
+
+.format-tag {
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  color: white;
+  padding: 0.3rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.variant-status {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-top: 0.5rem;
+}
+
+.variant-status.available {
+  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+  color: #065f46;
+  border: 1px solid #a7f3d0;
+}
+
+.variant-status.unavailable {
+  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+
+.status-icon {
+  width: 16px;
+  height: 16px;
+}
+
+/* Single variant layout */
+.single-variant-specs {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border: 2px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 2rem;
+  margin-top: 1rem;
+}
+
+.specs-grid {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.spec-card {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 1.25rem;
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.spec-card:hover {
+  border-color: #6366f1;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  transform: translateY(-1px);
+}
+
+.spec-icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+
+.spec-icon-wrapper .spec-icon {
+  width: 22px;
+  height: 22px;
+  color: white;
+}
+
+.spec-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  flex: 1;
+}
+
+.spec-content .spec-label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0;
+}
+
+.spec-content .spec-value {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+}
+
+.quality-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.4rem;
+}
+
+/* Mobile responsive */
+@media (max-width: 640px) {
+  .professional-product-meta {
+    margin: 1.5rem 0;
+  }
+  
+  .product__title + .professional-product-meta {
+    margin-top: 2rem !important;
+  }
+  
+  .variant-card {
+    padding: 1.25rem;
+  }
+  
+  .variant-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+  
+  .variant-title {
+    font-size: 1rem;
+  }
+  
+  .variant-price {
+    font-size: 1.2rem;
+  }
+  
+  .specs-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .spec-card {
+    padding: 1rem;
+  }
+  
+  .spec-icon-wrapper {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .spec-icon-wrapper .spec-icon {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+/* Desktop spacing improvements */
+@media (min-width: 990px) {
+  .professional-product-meta {
+    margin: 2.5rem 0;
+  }
+  
+  .product__title + .professional-product-meta {
+    margin-top: 3rem !important;
+  }
+}
+
+/* Prevent layout conflicts */
+.professional-product-meta * {
+  box-sizing: border-box;
+}
+
+.professional-product-meta::before,
+.professional-product-meta::after {
+  content: '';
+  display: table;
+  clear: both;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const productMeta = document.getElementById('ProductMeta-{{ section.id | default: "main" }}');
+  if (!productMeta) return;
+  
+  const variantCards = productMeta.querySelectorAll('.variant-card');
+  
+  // Listen for variant changes
+  document.addEventListener('change', function(e) {
+    if (e.target.name === 'id' || e.target.closest('variant-radios, variant-selects')) {
+      updateActiveVariantCard(e.target.value);
+    }
+  });
+  
+  document.addEventListener('variant:change', function(e) {
+    if (e.detail && e.detail.variant) {
+      updateActiveVariantCard(e.detail.variant.id);
+    }
+  });
+  
+  function updateActiveVariantCard(variantId) {
+    variantCards.forEach(card => {
+      const cardVariantId = card.getAttribute('data-variant-id');
+      if (cardVariantId == variantId) {
+        card.classList.add('active');
+      } else {
+        card.classList.remove('active');
+      }
+    });
+  }
+  
+  // Set initial active state
+  const currentVariantInput = document.querySelector('input[name="id"]:checked, select[name="id"]');
+  if (currentVariantInput) {
+    updateActiveVariantCard(currentVariantInput.value);
+  }
+});
+</script>
+{%- endif -%} 

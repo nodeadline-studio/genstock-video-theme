@@ -1,0 +1,80 @@
+{%- comment -%}
+  Canonical URL Fix for SEO
+  Ensures proper canonical URLs for all pages - SAFE VERSION
+{%- endcomment -%}
+
+{%- assign current_url = request.url | downcase -%}
+{%- assign canonical_url = shop.url -%}
+
+{%- if template contains 'product' -%}
+  {%- assign canonical_url = shop.url | append: product.url | split: '?' | first -%}
+{%- elsif template contains 'collection' -%}
+  {%- assign canonical_url = shop.url | append: collection.url | split: '?' | first -%}
+{%- elsif template contains 'page' -%}
+  {%- assign canonical_url = shop.url | append: page.url | split: '?' | first -%}
+{%- elsif template contains 'blog' -%}
+  {%- if article -%}
+    {%- assign canonical_url = shop.url | append: article.url | split: '?' | first -%}
+  {%- else -%}
+    {%- assign canonical_url = shop.url | append: blog.url | split: '?' | first -%}
+  {%- endif -%}
+{%- elsif template == 'index' -%}
+  {%- assign canonical_url = shop.url -%}
+{%- else -%}
+  {%- assign canonical_url = shop.url | append: request.path | split: '?' | first -%}
+{%- endif -%}
+
+<link rel="canonical" href="{{ canonical_url }}">
+
+{%- comment -%} Additional Open Graph canonical {%- endcomment -%}
+<meta property="og:url" content="{{ canonical_url }}">
+
+{%- comment -%} Redirect tracking URLs with JavaScript {%- endcomment -%}
+{%- if current_url contains 'wpm@' or current_url contains 'web-pixel-shopify-custom-pixel' or current_url contains 'sandbox/modern' -%}
+<script>
+  // Redirect tracking URLs to clean canonical URL
+  if (window.location.href !== "{{ canonical_url }}") {
+    window.location.replace("{{ canonical_url }}");
+  }
+</script>
+{%- endif -%}
+
+{%- comment -%} Add Twitter canonical URL {%- endcomment -%}
+<meta name="twitter:url" content="{{ canonical_url }}">
+
+{%- comment -%} Add prev/next pagination links for collections {%- endcomment -%}
+{%- if request.page_type == 'collection' and paginate -%}
+  {%- if paginate.previous -%}
+    <link rel="prev" href="{{ paginate.previous.url | split: '?' | first }}">
+  {%- endif -%}
+  {%- if paginate.next -%}
+    <link rel="next" href="{{ paginate.next.url | split: '?' | first }}">
+  {%- endif -%}
+{%- endif -%}
+
+{%- comment -%} Add alternate URLs for different currencies/languages {%- endcomment -%}
+{%- if localization.available_languages.size > 1 -%}
+  {%- for language in localization.available_languages -%}
+    {%- unless language.iso_code == request.locale.iso_code -%}
+      <link rel="alternate" hreflang="{{ language.iso_code }}" href="{{ canonical_url | replace: '/' | append: request.locale.iso_code | append: '/', '/' | append: language.iso_code | append: '/' }}">
+    {%- endunless -%}
+  {%- endfor -%}
+  <link rel="alternate" hreflang="x-default" href="{{ canonical_url | replace: '/' | append: request.locale.iso_code | append: '/', '/' }}">
+{%- endif -%}
+
+{%- comment -%} CONSERVATIVE noindex only for confirmed problematic URLs {%- endcomment -%}
+{%- assign should_noindex = false -%}
+{%- if current_url contains 'sandbox/modern' -%}
+  {%- assign should_noindex = true -%}
+{%- elsif current_url contains 'web-pixel-shopify-custom-pixel' -%}
+  {%- assign should_noindex = true -%}
+{%- elsif current_url contains 'wpm@' -%}
+  {%- assign should_noindex = true -%}
+{%- elsif request.path contains '${' -%}
+  {%- assign should_noindex = true -%}
+{%- endif -%}
+
+{%- if should_noindex -%}
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="googlebot" content="noindex,nofollow">
+{%- endif -%} 

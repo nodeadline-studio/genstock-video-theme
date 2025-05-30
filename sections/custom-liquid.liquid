@@ -1,0 +1,404 @@
+{{ 'video-header-2025.css' | asset_url | stylesheet_tag }}
+
+{%- style -%}
+  .section-{{ section.id }}-padding {
+    padding-top: calc({{ section.settings.padding_top }}px * 0.75);
+    padding-bottom: calc({{ section.settings.padding_bottom }}px  * 0.75);
+  }
+
+  @media screen and (min-width: 750px) {
+    .section-{{ section.id }}-padding {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+  }
+
+  /* Video Header Mode Styles */
+  {%- if section.settings.enable_video_header -%}
+  .video-header-custom-{{ section.id }} {
+    position: relative;
+    height: {{ section.settings.video_height | default: 100 }}vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    margin-top: calc(-{{ section.settings.padding_top }}px * 0.75);
+    margin-bottom: calc(-{{ section.settings.padding_bottom }}px * 0.75);
+  }
+
+  @media screen and (min-width: 750px) {
+    .video-header-custom-{{ section.id }} {
+      margin-top: -{{ section.settings.padding_top }}px;
+      margin-bottom: -{{ section.settings.padding_bottom }}px;
+    }
+  }
+
+  .video-header-custom-{{ section.id }} .video-header__background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+  }
+
+  .video-header-custom-{{ section.id }} .video-header__video {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    min-width: 100%;
+    min-height: 100%;
+    width: auto;
+    height: auto;
+    transform: translate(-50%, -50%);
+    object-fit: cover;
+    z-index: 1;
+    backface-visibility: hidden;
+  }
+
+  .video-header-custom-{{ section.id }} .video-header__overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      135deg,
+      rgba(102, 126, 234, {{ section.settings.video_overlay | default: 40 | divided_by: 100.0 }}) 0%,
+      rgba(118, 75, 162, {{ section.settings.video_overlay | default: 40 | divided_by: 100.0 }}) 100%
+    );
+    z-index: 2;
+  }
+
+  .video-header-custom-{{ section.id }} .video-header__content {
+    position: relative;
+    z-index: 3;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: white;
+  }
+
+  .video-header-custom-{{ section.id }} .video-header__heading {
+    font-size: clamp(3rem, 8vw, 6rem);
+    font-weight: 800;
+    line-height: 1.1;
+    margin: 0 0 1.5rem 0;
+    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  }
+
+  .video-header-custom-{{ section.id }} .video-header__text {
+    font-size: clamp(1.125rem, 2.5vw, 1.5rem);
+    line-height: 1.6;
+    margin: 0 0 3rem 0;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    opacity: 0.9;
+  }
+
+  .video-header-custom-{{ section.id }} .video-header__button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 2.5rem;
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    font-size: 1.125rem;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 10px 40px rgba(99, 102, 241, 0.3);
+  }
+
+  .video-header-custom-{{ section.id }} .video-header__button:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 15px 50px rgba(99, 102, 241, 0.4);
+  }
+
+  .video-header-custom-{{ section.id }} .video-header__button svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  @media screen and (max-width: 768px) {
+    .video-header-custom-{{ section.id }} {
+      height: 100vh;
+    }
+    
+    .video-header-custom-{{ section.id }} .video-header__heading {
+      margin-bottom: 1rem;
+    }
+    
+    .video-header-custom-{{ section.id }} .video-header__text {
+      margin-bottom: 2rem;
+    }
+    
+    .video-header-custom-{{ section.id }} .video-header__button {
+      width: 100%;
+      max-width: 280px;
+      justify-content: center;
+    }
+  }
+  {%- endif -%}
+{%- endstyle -%}
+
+<div class="color-{{ section.settings.color_scheme }} gradient">
+  {%- if section.settings.enable_video_header -%}
+    <!-- Video Header Mode -->
+    <div class="video-header-custom-{{ section.id }}">
+      <!-- Background Video -->
+      {%- if section.settings.video_url != blank -%}
+        <div class="video-header__background">
+          <video 
+            class="video-header__video"
+            autoplay 
+            muted 
+            loop 
+            playsinline
+            preload="metadata"
+          >
+            <source src="{{ section.settings.video_url }}" type="video/mp4">
+          </video>
+          <div class="video-header__overlay"></div>
+        </div>
+      {%- endif -%}
+
+      <!-- Content -->
+      <div class="video-header__content">
+        <div class="page-width">
+          {%- if section.settings.video_heading != blank -%}
+            <h1 class="video-header__heading">
+              {{ section.settings.video_heading }}
+            </h1>
+          {%- endif -%}
+          
+          {%- if section.settings.video_text != blank -%}
+            <div class="video-header__text">
+              {{ section.settings.video_text }}
+            </div>
+          {%- endif -%}
+          
+          {%- if section.settings.video_button_text != blank -%}
+            <button 
+              class="video-header__button"
+              onclick="smoothScrollToTarget('{{ section.settings.video_scroll_target | default: 'MainContent' }}')"
+            >
+              <span>{{ section.settings.video_button_text }}</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="m6 9 6 6 6-6"/>
+              </svg>
+            </button>
+          {%- endif -%}
+        </div>
+      </div>
+    </div>
+
+    <script>
+    // Smooth scroll function for video header
+    function smoothScrollToTarget(targetId) {
+      try {
+        let target = document.getElementById(targetId) || 
+                     document.querySelector('[data-scroll-target]') ||
+                     document.querySelector('.main-content-target');
+        
+        if (!target) {
+          target = document.querySelector('main') || 
+                   document.querySelector('.shopify-section:not(.section-header):not([class*="video-header"])');
+        }
+        
+        if (target) {
+          const headerHeight = document.querySelector('.section-header')?.offsetHeight || 0;
+          const adminBarHeight = document.querySelector('#admin_bar_iframe')?.offsetHeight || 0;
+          const targetPosition = target.offsetTop - headerHeight - adminBarHeight;
+          
+          window.scrollTo({
+            top: Math.max(0, targetPosition),
+            behavior: 'smooth'
+          });
+        } else {
+          window.scrollBy({
+            top: window.innerHeight * 0.8,
+            behavior: 'smooth'
+          });
+        }
+      } catch (error) {
+        window.scrollBy({
+          top: window.innerHeight * 0.8,
+          behavior: 'smooth'
+        });
+      }
+    }
+
+    // Video optimization
+    document.addEventListener('DOMContentLoaded', function() {
+      const video = document.querySelector('.video-header-custom-{{ section.id }} .video-header__video');
+      if (!video) return;
+
+      video.style.willChange = 'transform';
+      video.style.backfaceVisibility = 'hidden';
+
+      video.addEventListener('loadeddata', function() {
+        if (video.readyState >= 3) {
+          video.play().catch(e => console.log('Video autoplay prevented'));
+        }
+      });
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            video.play().catch(e => console.log('Video play prevented'));
+          } else {
+            video.pause();
+          }
+        });
+      }, { threshold: 0.1 });
+
+      observer.observe(video);
+    });
+    </script>
+
+  {%- else -%}
+    <!-- Regular Custom Liquid Mode -->
+    <div class="section-{{ section.id }}-padding">
+      {{ section.settings.custom_liquid }}
+    </div>
+  {%- endif -%}
+</div>
+
+{% schema %}
+{
+  "name": "t:sections.custom-liquid.name",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Video Header Mode"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_video_header",
+      "label": "Enable Video Header 2025",
+      "info": "Transform this section into a modern video header with CTA buttons",
+      "default": false
+    },
+    {
+      "type": "url",
+      "id": "video_url",
+      "label": "Video URL (MP4)",
+      "info": "Upload video to Shopify files and use URL here"
+    },
+    {
+      "type": "range",
+      "id": "video_height",
+      "min": 50,
+      "max": 100,
+      "step": 5,
+      "unit": "vh",
+      "label": "Video Height",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "video_overlay",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "unit": "%",
+      "label": "Video Overlay Opacity",
+      "default": 40
+    },
+    {
+      "type": "inline_richtext",
+      "id": "video_heading",
+      "label": "Video Heading",
+      "default": "Stories in Motion."
+    },
+    {
+      "type": "richtext",
+      "id": "video_text",
+      "label": "Video Text",
+      "default": "<p>Discover cinematic stock footage crafted for creators. From nature escapes to human drama — every clip is ready to elevate your content.</p>"
+    },
+    {
+      "type": "text",
+      "id": "video_button_text",
+      "label": "Button Text",
+      "default": "Explore Collection"
+    },
+    {
+      "type": "text",
+      "id": "video_scroll_target",
+      "label": "Scroll Target ID",
+      "default": "MainContent",
+      "info": "ID of element to scroll to when button is clicked"
+    },
+    {
+      "type": "header",
+      "content": "Custom Liquid Mode"
+    },
+    {
+      "type": "liquid",
+      "id": "custom_liquid",
+      "label": "t:sections.custom-liquid.settings.custom_liquid.label",
+      "info": "t:sections.custom-liquid.settings.custom_liquid.info"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:sections.all.colors.label",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.all.padding.section_padding_heading"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "t:sections.all.padding.padding_top",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "t:sections.all.padding.padding_bottom",
+      "default": 52
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.custom-liquid.presets.name"
+    },
+    {
+      "name": "Video Header 2025",
+      "settings": {
+        "enable_video_header": true,
+        "video_heading": "Stories in Motion.",
+        "video_text": "<p>Discover cinematic stock footage crafted for creators. From nature escapes to human drama — every clip is ready to elevate your content.</p>",
+        "video_button_text": "Explore Collection",
+        "video_height": 100,
+        "video_overlay": 40,
+        "padding_top": 0,
+        "padding_bottom": 0
+      }
+    }
+  ]
+}
+{% endschema %}

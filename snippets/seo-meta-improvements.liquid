@@ -1,0 +1,126 @@
+{%- comment -%}
+  SEO Meta Improvements
+  This snippet ensures all pages have proper meta descriptions and other SEO elements
+{%- endcomment -%}
+
+{%- liquid
+  assign meta_description = page_description
+  
+  if meta_description == blank
+    if request.page_type == 'product'
+      assign meta_description = product.description | strip_html | truncate: 160
+    elsif request.page_type == 'collection'
+      assign meta_description = collection.description | strip_html | truncate: 160
+      if meta_description == blank
+        assign meta_description = 'Shop ' | append: collection.title | append: ' at ' | append: shop.name | append: '. High-quality video content and digital assets.'
+      endif
+    elsif request.page_type == 'page'
+      assign meta_description = page.content | strip_html | truncate: 160
+      if meta_description == blank
+        assign meta_description = page.title | append: ' - ' | append: shop.name
+      endif
+    elsif request.page_type == 'article'
+      assign meta_description = article.excerpt | strip_html | truncate: 160
+      if meta_description == blank
+        assign meta_description = article.content | strip_html | truncate: 160
+      endif
+    elsif request.page_type == 'blog'
+      assign meta_description = blog.title | append: ' - Latest articles and updates from ' | append: shop.name
+    elsif request.page_type == 'index'
+      assign meta_description = shop.description
+      if meta_description == blank
+        assign meta_description = 'Premium video content and digital assets at ' | append: shop.name | append: '. Discover high-quality videos for your projects.'
+      endif
+    else
+      assign meta_description = shop.description | default: shop.name
+    endif
+  endif
+-%}
+
+{%- comment -%} Ensure meta description exists and is properly formatted {%- endcomment -%}
+{%- if meta_description != blank -%}
+  <meta name="description" content="{{ meta_description | escape }}">
+{%- endif -%}
+
+{%- comment -%} Add additional meta tags for better SEO {%- endcomment -%}
+<meta name="author" content="{{ shop.name | escape }}">
+<meta name="generator" content="Shopify">
+
+{%- if request.page_type == 'product' -%}
+  <meta name="product:price:amount" content="{{ product.selected_or_first_available_variant.price | money_without_currency | strip_html }}">
+  <meta name="product:price:currency" content="{{ cart.currency.iso_code }}">
+  <meta name="product:availability" content="{% if product.available %}in stock{% else %}out of stock{% endif %}">
+  <meta name="product:condition" content="new">
+  <meta name="product:brand" content="{{ product.vendor | escape }}">
+  <meta name="product:category" content="{{ product.type | escape }}">
+  
+  {%- if product.selected_or_first_available_variant.sku != blank -%}
+    <meta name="product:retailer_item_id" content="{{ product.selected_or_first_available_variant.sku | escape }}">
+  {%- endif -%}
+  
+  {%- if product.selected_or_first_available_variant.barcode != blank -%}
+    <meta name="product:gtin" content="{{ product.selected_or_first_available_variant.barcode | escape }}">
+  {%- endif -%}
+{%- endif -%}
+
+{%- comment -%} Add structured data for missing fields {%- endcomment -%}
+{%- if request.page_type == 'product' -%}
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "{{ shop.url }}"
+      }
+      {%- if product.collections.first -%}
+      ,{
+        "@type": "ListItem",
+        "position": 2,
+        "name": "{{ product.collections.first.title | escape }}",
+        "item": "{{ shop.url }}{{ product.collections.first.url | split: '?' | first }}"
+      }
+      ,{
+        "@type": "ListItem",
+        "position": 3,
+        "name": "{{ product.title | escape }}",
+        "item": "{{ shop.url }}{{ product.url | split: '?' | first }}"
+      }
+      {%- else -%}
+      ,{
+        "@type": "ListItem",
+        "position": 2,
+        "name": "{{ product.title | escape }}",
+        "item": "{{ shop.url }}{{ product.url | split: '?' | first }}"
+      }
+      {%- endif -%}
+    ]
+  }
+  </script>
+{%- endif -%}
+
+{%- comment -%} Add JSON-LD for WebPage to ensure proper page identification {%- endcomment -%}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "@id": "{{ shop.url }}{{ request.path }}#webpage",
+  "url": "{{ shop.url }}{{ request.path }}",
+  "name": "{{ page_title | escape }}",
+  {%- if meta_description != blank -%}
+  "description": "{{ meta_description | escape }}",
+  {%- endif -%}
+  "inLanguage": "{{ request.locale.iso_code }}",
+  "isPartOf": {
+    "@type": "WebSite",
+    "@id": "{{ shop.url }}#website",
+    "name": "{{ shop.name | escape }}",
+    "url": "{{ shop.url }}"
+  },
+  "datePublished": "{% if request.page_type == 'product' %}{{ product.created_at | date: '%Y-%m-%d' }}{% elsif request.page_type == 'article' %}{{ article.created_at | date: '%Y-%m-%d' }}{% elsif request.page_type == 'page' %}{{ page.created_at | date: '%Y-%m-%d' }}{% else %}{{ shop.created_at | date: '%Y-%m-%d' }}{% endif %}",
+  "dateModified": "{% if request.page_type == 'product' %}{{ product.updated_at | date: '%Y-%m-%d' }}{% elsif request.page_type == 'article' %}{{ article.updated_at | date: '%Y-%m-%d' }}{% elsif request.page_type == 'page' %}{{ page.updated_at | date: '%Y-%m-%d' }}{% else %}{{ 'now' | date: '%Y-%m-%d' }}{% endif %}"
+}
+</script> 

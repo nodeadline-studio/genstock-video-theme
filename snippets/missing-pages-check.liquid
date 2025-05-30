@@ -1,0 +1,70 @@
+{%- comment -%}
+  Missing Pages Check
+  This snippet helps identify and handle missing pages
+{%- endcomment -%}
+
+{%- comment -%} Check if contact page exists {%- endcomment -%}
+{%- assign contact_page = pages['contact'] -%}
+{%- if contact_page == blank -%}
+  {%- comment -%} Contact page is missing - this might cause 404 for /pages/contact {%- endcomment -%}
+  <!-- Missing: Contact page (/pages/contact) -->
+{%- endif -%}
+
+{%- comment -%} Check for other common pages that might be missing {%- endcomment -%}
+{%- assign about_page = pages['about'] -%}
+{%- assign faq_page = pages['faq'] -%}
+{%- assign privacy_page = pages['privacy-policy'] -%}
+{%- assign terms_page = pages['terms-of-service'] -%}
+
+{%- comment -%} Add structured data for missing page detection {%- endcomment -%}
+{%- if template.name == '404' -%}
+  <script>
+    // Log missing page for debugging
+    console.log('404 Error for path:', window.location.pathname);
+    
+    // Send information about missing pages (for development only)
+    if (window.location.hostname.includes('myshopify.com')) {
+      const missingPages = [];
+      
+      {% unless contact_page %}
+      missingPages.push('contact');
+      {% endunless %}
+      
+      {% unless about_page %}
+      missingPages.push('about');
+      {% endunless %}
+      
+      {% unless faq_page %}
+      missingPages.push('faq');
+      {% endunless %}
+      
+      if (missingPages.length > 0) {
+        console.log('Missing pages detected:', missingPages);
+      }
+    }
+  </script>
+{%- endif -%}
+
+{%- comment -%} Provide helpful navigation for 404 pages {%- endcomment -%}
+{%- if template.name == '404' -%}
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "{{ shop.url }}"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Page Not Found",
+        "item": "{{ shop.url }}{{ request.path }}"
+      }
+    ]
+  }
+  </script>
+{%- endif -%} 

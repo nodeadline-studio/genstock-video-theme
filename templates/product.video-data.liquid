@@ -1,0 +1,35 @@
+{% comment %}
+  This template provides video data for product cards
+  It returns the first video in the product's media gallery with various formats
+{% endcomment %}
+
+{% assign video_found = false %}
+
+{% for media in product.media %}
+  {% if media.media_type == 'video' %}
+    {% assign video_found = true %}
+    <div data-video-type="hosted">
+      {% for source in media.sources %}
+        {% assign format = source.format | downcase %}
+        <div 
+          data-source-{{ format }}="{{ source.url }}"
+          {% if forloop.first %}data-video-url="{{ source.url }}"{% endif %}
+        ></div>
+      {% endfor %}
+    </div>
+    {% break %}
+  {% elsif media.media_type == 'external_video' %}
+    {% assign video_found = true %}
+    {% if media.host == 'youtube' %}
+      <div data-video-url="https://www.youtube.com/embed/{{ media.external_id }}?autoplay=1&muted=1&loop=1&playlist={{ media.external_id }}&enablejsapi=1" data-video-type="youtube"></div>
+    {% elsif media.host == 'vimeo' %}
+      <div data-video-url="https://player.vimeo.com/video/{{ media.external_id }}?autoplay=1&muted=1&loop=1" data-video-type="vimeo"></div>
+    {% endif %}
+    {% break %}
+  {% endif %}
+{% endfor %}
+
+{% unless video_found %}
+  <!-- No video media found -->
+  <div class="no-video"></div>
+{% endunless %} 

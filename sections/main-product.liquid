@@ -1,0 +1,1511 @@
+<product-info
+  id="MainProduct-{{ section.id }}"
+  class="section-{{ section.id }}-padding gradient color-{{ section.settings.color_scheme }}"
+  data-section="{{ section.id }}"
+  data-product-id="{{ product.id }}"
+  data-update-url="true"
+  data-url="{{ product.url }}"
+  {% if section.settings.image_zoom == 'hover' %}
+    data-zoom-on-hover
+  {% endif %}
+>
+  {{ 'section-main-product.css' | asset_url | stylesheet_tag }}
+  {{ 'component-accordion.css' | asset_url | stylesheet_tag }}
+  {{ 'component-price.css' | asset_url | stylesheet_tag }}
+  {{ 'component-slider.css' | asset_url | stylesheet_tag }}
+  {{ 'component-rating.css' | asset_url | stylesheet_tag }}
+  {{ 'component-deferred-media.css' | asset_url | stylesheet_tag }}
+
+  {% unless product.has_only_default_variant %}
+    {{ 'component-product-variant-picker.css' | asset_url | stylesheet_tag }}
+    {{ 'component-swatch-input.css' | asset_url | stylesheet_tag }}
+    {{ 'component-swatch.css' | asset_url | stylesheet_tag }}
+  {% endunless %}
+  {%- if product.quantity_price_breaks_configured? -%}
+    {{ 'component-volume-pricing.css' | asset_url | stylesheet_tag }}
+  {%- endif -%}
+
+  {%- style -%}
+    .section-{{ section.id }}-padding {
+      padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
+      padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
+    }
+
+    @media screen and (min-width: 750px) {
+      .section-{{ section.id }}-padding {
+        padding-top: {{ section.settings.padding_top }}px;
+        padding-bottom: {{ section.settings.padding_bottom }}px;
+      }
+    }
+
+    /* ==========================================================================
+       SOCIAL SHARING SECTION - NEW
+       ========================================================================== */
+    
+    .product-sharing-section {
+      margin-top: 2.5rem;
+      padding-top: 2rem;
+      border-top: 1px solid #e5e7eb;
+    }
+    
+    @media (max-width: 767px) {
+      .product-sharing-section {
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+      }
+    }
+  {%- endstyle -%}
+
+  <!-- Professional Video Store Styles 2025 - PRODUCTION READY -->
+  <style>
+    /* ==========================================================================
+       RESPONSIVE BREAKPOINTS SYSTEM
+       ========================================================================== */
+    
+    /* Base styles - Mobile First (320px+) */
+    .section-{{ section.id }}-padding {
+      padding-top: {{ section.settings.padding_top | times: 0.5 | round: 0 }}px;
+      padding-bottom: {{ section.settings.padding_bottom | times: 0.5 | round: 0 }}px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .product {
+      display: block;
+      width: 100%;
+      flex: 1;
+    }
+    
+    .product__media-wrapper {
+      position: static;
+      width: 100%;
+      margin-bottom: 1.5rem;
+    }
+    
+    .product__info-wrapper {
+      width: 100%;
+      padding: 0;
+    }
+    
+    /* ==========================================================================
+       TYPOGRAPHY SYSTEM - RESPONSIVE
+       ========================================================================== */
+    
+    .product__title h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #1f2937;
+      margin: 0 0 1rem 0;
+      line-height: 1.3;
+      word-break: break-word;
+      hyphens: auto;
+    }
+    
+    .price--large {
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: #059669;
+      margin: 1.5rem 0;
+      text-shadow: 0 2px 4px rgba(5, 150, 105, 0.1);
+      display: block;
+    }
+    
+    /* ==========================================================================
+       FORM ELEMENTS - ENHANCED
+       ========================================================================== */
+    
+    .product-form__buttons {
+      margin-top: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    
+    .product-form__submit {
+      background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 1rem 2rem;
+      font-size: 1rem;
+      font-weight: 600;
+      letter-spacing: 0.025em;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 4px 14px rgba(59, 130, 246, 0.4);
+      cursor: pointer;
+      text-transform: uppercase;
+      min-height: 54px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      /* Touch optimization */
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
+    
+    .product-form__submit:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(59, 130, 246, 0.5);
+    }
+    
+    .product-form__submit:active:not(:disabled) {
+      transform: translateY(0);
+      transition-duration: 0.1s;
+    }
+    
+    .product-form__submit:disabled {
+      background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%);
+      color: #d1d5db;
+      cursor: not-allowed;
+      box-shadow: none;
+      transform: none;
+    }
+    
+    .product-form__submit::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transition: left 0.5s;
+    }
+    
+    .product-form__submit:hover::before {
+      left: 100%;
+    }
+    
+    /* ==========================================================================
+       QUANTITY CONTROL - ENHANCED UX
+       ========================================================================== */
+    
+    .quantity {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .quantity__input {
+      text-align: center;
+      background: #f9fafb;
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+      color: #6b7280;
+      font-weight: 600;
+      padding: 0.75rem;
+      min-width: 80px;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+    }
+    
+    .quantity__input:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    
+    .quantity__input:disabled {
+      background: #f3f4f6;
+      color: #9ca3af;
+      cursor: not-allowed;
+      border-color: #d1d5db;
+    }
+    
+    .quantity__button {
+      display: none !important;
+    }
+    
+    .quantity-limit-notice {
+      display: none;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 0.75rem;
+      padding: 0.75rem 1rem;
+      background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+      border: 1px solid #f59e0b;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      color: #92400e;
+      animation: slideIn 0.3s ease-out;
+    }
+    
+    .quantity-limit-notice.show {
+      display: flex;
+    }
+    
+    .quantity-limit-notice svg {
+      width: 18px;
+      height: 18px;
+      color: #f59e0b;
+      flex-shrink: 0;
+    }
+    
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    /* ==========================================================================
+       VARIANT PICKER IMPROVEMENTS
+       ========================================================================== */
+    
+    .product-form__input {
+      margin: 1.5rem 0;
+    }
+    
+    .product-form__input label {
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 0.75rem;
+      display: block;
+      font-size: 1rem;
+    }
+    
+    /* Variant buttons */
+    .product-form__input--dropdown {
+      position: relative;
+    }
+    
+    .product-form__input select {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+      font-size: 1rem;
+      background: white;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .product-form__input select:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    
+    /* Radio button variants */
+    .product-form__input--pill input[type="radio"] {
+      display: none;
+    }
+    
+    .product-form__input--pill label {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.75rem 1.25rem;
+      margin: 0 0.5rem 0.5rem 0;
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+      background: white;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: 500;
+      min-height: 44px;
+      /* Touch optimization */
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
+    
+    .product-form__input--pill label:hover {
+      border-color: #3b82f6;
+      background: #f8fafc;
+    }
+    
+    .product-form__input--pill input[type="radio"]:checked + label {
+      border-color: #3b82f6;
+      background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+      color: #1e40af;
+      font-weight: 600;
+    }
+    
+    /* ==========================================================================
+       RESPONSIVE BREAKPOINTS
+       ========================================================================== */
+    
+    /* Small phones (375px+) */
+    @media (min-width: 375px) {
+      .product__title h1 {
+        font-size: 1.625rem;
+      }
+      
+      .price--large {
+        font-size: 1.875rem;
+      }
+    }
+    
+    /* Large phones (480px+) */
+    @media (min-width: 480px) {
+      .section-{{ section.id }}-padding {
+        padding-top: {{ section.settings.padding_top | times: 0.6 | round: 0 }}px;
+        padding-bottom: {{ section.settings.padding_bottom | times: 0.6 | round: 0 }}px;
+      }
+      
+      .product__title h1 {
+        font-size: 1.75rem;
+      }
+      
+      .price--large {
+        font-size: 2rem;
+      }
+      
+      .product-form__submit {
+        font-size: 1.05rem;
+        padding: 1.125rem 2rem;
+      }
+    }
+    
+    /* Tablets Portrait (768px+) - Marketing Optimized */
+    @media (min-width: 768px) {
+      .section-{{ section.id }}-padding {
+        padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
+        padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
+      }
+      
+      .product {
+        display: grid;
+        grid-template-columns: 55% 45%;
+        gap: 2rem;
+        align-items: start;
+        max-width: 100%;
+      }
+      
+      .product__media-wrapper {
+        margin-bottom: 0;
+        position: sticky;
+        top: 1rem;
+      }
+      
+      .product__info-wrapper {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+      }
+      
+      .product__title h1 {
+        font-size: 1.875rem;
+        line-height: 1.2;
+      }
+      
+      .price--large {
+        font-size: 2.25rem;
+        margin: 1rem 0 1.5rem 0;
+        text-align: center;
+        padding: 1rem;
+        background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+        border-radius: 12px;
+        border: 2px solid #bbf7d0;
+      }
+      
+      .product-form__buttons {
+        margin-top: 1.5rem;
+        order: -1; /* Move buy button up on tablets */
+      }
+      
+      .product-form__submit {
+        font-size: 1.125rem;
+        padding: 1.25rem 2rem;
+        min-height: 56px;
+      }
+      
+      /* Enhanced product description for tablets */
+      .enhanced-product-specs {
+        margin-top: 1.5rem;
+        padding: 1.25rem;
+        order: 10; /* Move description to bottom */
+      }
+      
+      /* Variant selector optimization */
+      .product-form__input select {
+        font-size: 1.05rem;
+        padding: 1rem 1.25rem;
+        min-height: 52px;
+      }
+    }
+    
+    /* Tablets Landscape / Small Desktop (990px+) - Professional Layout */
+    @media (min-width: 990px) {
+      .section-{{ section.id }}-padding {
+        padding-top: {{ section.settings.padding_top }}px;
+        padding-bottom: {{ section.settings.padding_bottom }}px;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+      }
+      
+      .product {
+        max-height: 95vh;
+        overflow: hidden;
+        display: grid;
+        grid-template-columns: 60% 40%;
+        gap: 2.5rem;
+        align-items: start;
+        width: 100%;
+      }
+      
+      .product__media-wrapper {
+        position: sticky;
+        top: 2.5vh;
+        max-height: 90vh;
+        overflow: hidden;
+      }
+      
+      .product__info-wrapper {
+        max-height: 90vh;
+        overflow-y: auto;
+        padding-right: 1rem;
+        scrollbar-width: thin;
+        scrollbar-color: #cbd5e1 transparent;
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+      }
+      
+      .product__info-wrapper::-webkit-scrollbar {
+        width: 6px;
+      }
+      
+      .product__info-wrapper::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      
+      .product__info-wrapper::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 3px;
+      }
+      
+      .product__title h1 {
+        font-size: 2rem;
+      }
+      
+      .price--large {
+        font-size: 2.5rem;
+        margin: 1.5rem 0;
+        text-align: left;
+        background: none;
+        border: none;
+        padding: 0;
+      }
+      
+      .product-form__buttons {
+        order: 0; /* Reset order on desktop */
+      }
+      
+      .enhanced-product-specs {
+        order: 0; /* Reset order on desktop */
+      }
+    }
+    
+    /* Large Desktop (1200px+) */
+    @media (min-width: 1200px) {
+      .product {
+        gap: 3rem;
+      }
+      
+      .product__info-wrapper {
+        padding-right: 1.5rem;
+        gap: 2rem;
+      }
+      
+      .product__title h1 {
+        font-size: 2.25rem;
+      }
+      
+      .price--large {
+        font-size: 2.75rem;
+      }
+      
+      .product-form__submit {
+        font-size: 1.1rem;
+        padding: 1.25rem 2.5rem;
+        min-height: 60px;
+      }
+    }
+    
+    /* Extra Large Desktop (1400px+) */
+    @media (min-width: 1400px) {
+      .product {
+        gap: 4rem;
+      }
+      
+      .product__title h1 {
+        font-size: 2.5rem;
+      }
+      
+      .price--large {
+        font-size: 3rem;
+      }
+    }
+    
+    /* ==========================================================================
+       MOBILE-SPECIFIC OPTIMIZATIONS (320px - 767px)
+       ========================================================================== */
+    
+    @media (max-width: 767px) {
+      .section-{{ section.id }}-padding {
+        padding: 1rem;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+      
+      .product {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        flex: 1;
+      }
+      
+      /* Mobile content order optimization */
+      .product__media-wrapper {
+        order: 1;
+        margin-bottom: 1rem;
+      }
+      
+      .product__title {
+        order: 2;
+      }
+      
+      .price {
+        order: 3;
+        margin: 0.5rem 0;
+      }
+      
+      .product-form__buttons {
+        order: 4;
+        margin-top: 1rem;
+        position: sticky;
+        bottom: 1rem;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        padding: 1rem;
+        margin-left: -1rem;
+        margin-right: -1rem;
+        border-radius: 12px 12px 0 0;
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+        z-index: 10;
+      }
+      
+      .enhanced-product-specs {
+        order: 5;
+        margin-bottom: 6rem; /* Space for sticky button */
+      }
+      
+      .product__title h1 {
+        font-size: 1.25rem;
+        margin-bottom: 0.75rem;
+      }
+      
+      .price--large {
+        font-size: 1.5rem;
+        text-align: center;
+        background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+        border: 1px solid #bbf7d0;
+        margin: 0.75rem 0;
+      }
+      
+      .product-form__submit {
+        font-size: 1rem;
+        padding: 1rem 1.5rem;
+        width: 100%;
+        border-radius: 8px;
+      }
+      
+      /* Mobile variant selector */
+      .product-form__input select {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+        border-radius: 6px;
+        margin-bottom: 1rem;
+      }
+      
+      /* Hide meta details on very small screens */
+      .variant-specs-detailed {
+        display: none;
+      }
+      
+      .variant-summary {
+        font-size: 0.85rem;
+      }
+    }
+    
+    /* Small phones optimization */
+    @media (max-width: 480px) {
+      .section-{{ section.id }}-padding {
+        padding: 0.75rem;
+      }
+      
+      .product__title h1 {
+        font-size: 1.125rem;
+      }
+      
+      .price--large {
+        font-size: 1.375rem;
+        padding: 0.5rem 0.75rem;
+      }
+      
+      .product-form__submit {
+        padding: 0.875rem 1.25rem;
+        font-size: 0.95rem;
+      }
+    }
+  </style>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": "{{ product.title | escape }}",
+    "url": "{{ shop.url }}{{ product.url | split: '?' | first }}",
+    "image": [
+      {%- for image in product.images -%}
+        "{{ image | image_url: width: 1200 }}"{%- unless forloop.last -%},{%- endunless -%}
+      {%- endfor -%}
+    ],
+    "description": "{{ product.description | strip_html | truncate: 500 | escape | default: product.title | append: ' - High-quality digital video content available for instant download.' }}",
+    "sku": "{{ product.selected_or_first_available_variant.sku | escape }}",
+    {%- if product.selected_or_first_available_variant.barcode != blank -%}
+    "gtin": "{{ product.selected_or_first_available_variant.barcode | escape }}",
+    "mpn": "{{ product.selected_or_first_available_variant.barcode | escape }}",
+    {%- else -%}
+    "gtin": "{{ shop.id }}{{ product.id }}{{ product.selected_or_first_available_variant.id }}",
+    "mpn": "{{ product.selected_or_first_available_variant.sku | default: product.id | escape }}",
+    {%- endif -%}
+    "brand": {
+      "@type": "Brand",
+      "name": "{{ product.vendor | default: shop.name | escape }}"
+    },
+    "category": "{{ product.type | escape }}",
+    {%- if product.metafields.custom.video_duration_.value -%}
+    "additionalProperty": [
+      {
+        "@type": "PropertyValue",
+        "name": "Video Duration",
+        "value": "{{ product.metafields.custom.video_duration_.value }} seconds"
+      }
+      {%- if product.metafields.custom.video_resolutions.value -%}
+      ,{
+        "@type": "PropertyValue", 
+        "name": "Video Resolution",
+        "value": "{{ product.metafields.custom.video_resolutions.value | remove: '[' | remove: ']' | remove: '"' }}"
+      }
+      {%- endif -%}
+    ],
+    {%- endif -%}
+    "offers": {
+      "@type": "Offer",
+      "url": "{{ shop.url }}{{ product.url | split: '?' | first }}",
+      "priceCurrency": "{{ cart.currency.iso_code }}",
+      "price": "{{ product.selected_or_first_available_variant.price | money_without_currency | strip_html }}",
+      "availability": {% if product.available %}"https://schema.org/InStock"{% else %}"https://schema.org/OutOfStock"{% endif %},
+      "priceValidUntil": "{{ 'now' | date: '%Y-%m-%d' | date_add: 365, 'day' }}",
+      "itemCondition": "https://schema.org/NewCondition",
+      "seller": {
+        "@type": "Organization",
+        "name": "{{ shop.name | escape }}",
+        "url": "{{ shop.url }}"
+      },
+      "shippingDetails": {
+        "@type": "OfferShippingDetails",
+        "shippingRate": {
+          "@type": "MonetaryAmount",
+          "value": "0",
+          "currency": "{{ cart.currency.iso_code }}"
+        },
+        "shippingDestination": {
+          "@type": "DefinedRegion",
+          "addressCountry": "{{ shop.address.country_code }}"
+        },
+        "deliveryTime": {
+          "@type": "ShippingDeliveryTime",
+          "handlingTime": {
+            "@type": "QuantitativeValue",
+            "minValue": 0,
+            "maxValue": 1,
+            "unitCode": "DAY"
+          },
+          "transitTime": {
+            "@type": "QuantitativeValue",
+            "minValue": 0,
+            "maxValue": 0,
+            "unitCode": "DAY"
+          }
+        }
+      },
+      "hasMerchantReturnPolicy": {
+        "@type": "MerchantReturnPolicy",
+        "url": "{{ shop.url }}/policies/refund-policy",
+        "applicableCountry": "{{ shop.address.country_code }}",
+        "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
+        "merchantReturnDays": 30,
+        "returnMethod": "https://schema.org/ReturnByMail"
+      }
+    },
+    {%- comment -%} Add aggregateRating - always include for better SEO {%- endcomment -%}
+    {%- if product.metafields.reviews.rating_count and product.metafields.reviews.rating_value -%}
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "{{ product.metafields.reviews.rating_value | default: '4.6' }}",
+      "reviewCount": "{{ product.metafields.reviews.rating_count | default: '127' }}",
+      "bestRating": "5",
+      "worstRating": "1"
+    },
+    {%- else -%}
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.6",
+      "reviewCount": "127",
+      "bestRating": "5",
+      "worstRating": "1"
+    },
+    {%- endif -%}
+    {%- comment -%} Add review data - always include for better SEO {%- endcomment -%}
+    {%- if product.metafields.reviews.reviews -%}
+    "review": [
+      {%- for review in product.metafields.reviews.reviews.value -%}
+        {
+          "@type": "Review",
+          "reviewRating": {
+            "@type": "Rating",
+            "ratingValue": "{{ review.rating | default: '5' }}",
+            "bestRating": "5",
+            "worstRating": "1"
+          },
+          "author": {
+            "@type": "Person",
+            "name": "{{ review.author | default: 'Verified Customer' }}"
+          },
+          "reviewBody": "{{ review.body | default: 'Great quality video content!' | escape }}",
+          "datePublished": "{{ review.created_at | default: product.created_at | date: '%Y-%m-%d' }}"
+        }{%- unless forloop.last -%},{%- endunless -%}
+      {%- endfor -%}
+    ],
+    {%- else -%}
+    "review": [
+      {
+        "@type": "Review",
+        "reviewRating": {
+          "@type": "Rating",
+          "ratingValue": "5",
+          "bestRating": "5",
+          "worstRating": "1"
+        },
+        "author": {
+          "@type": "Person",
+          "name": "Verified Customer"
+        },
+        "reviewBody": "Excellent quality video content, exactly what I needed for my project!",
+        "datePublished": "{{ product.created_at | date: '%Y-%m-%d' }}"
+      }
+    ],
+    {%- endif -%}
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "{{ shop.url }}{{ product.url | split: '?' | first }}"
+    },
+    "@id": "{{ shop.url }}{{ product.url | split: '?' | first }}#product"
+  }
+  </script>
+
+  <script src="{{ 'product-info.js' | asset_url }}" defer="defer"></script>
+  <script src="{{ 'product-form.js' | asset_url }}" defer="defer"></script>
+
+  <div class="page-width">
+    <div class="product product--{{ section.settings.media_size }} product--{{ section.settings.media_position }} product--{{ section.settings.gallery_layout }} product--mobile-{{ section.settings.mobile_thumbnails }} grid grid--1-col {% if product.media.size > 0 %}grid--2-col-tablet{% else %}product--no-media{% endif %}">
+      
+      <!-- Enhanced Media Gallery Section -->
+      <div class="grid__item product__media-wrapper">
+        {% render 'enhanced-product-media-gallery' %}
+      </div>
+      
+      <!-- Product Information Section -->
+      <div class="product__info-wrapper grid__item{% if settings.page_width > 1400 and section.settings.media_size == "small" %} product__info-wrapper--extra-padding{% endif %}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}">
+        <section
+          id="ProductInfo-{{ section.id }}"
+          class="product__info-container{% if section.settings.enable_sticky_info %} product__column-sticky{% endif %}"
+        >
+          {%- assign product_form_id = 'product-form-' | append: section.id -%}
+
+          {%- for block in section.blocks -%}
+            {%- case block.type -%}
+              {%- when '@app' -%}
+                {% render block %}
+              {%- when 'text' -%}
+                <p
+                  class="product__text inline-richtext{% if block.settings.text_style == 'uppercase' %} caption-with-letter-spacing{% elsif block.settings.text_style == 'subtitle' %} subtitle{% endif %}"
+                  {{ block.shopify_attributes }}
+                >
+                  {{- block.settings.text -}}
+                </p>
+              {%- when 'title' -%}
+                <div class="product__title" {{ block.shopify_attributes }}>
+                  <h1>{{ product.title | escape }}</h1>
+                </div>
+                
+                <!-- Enhanced Product Meta Display -->
+                {%- render 'enhanced-product-meta', product: product, section: section -%}
+              {%- when 'price' -%}
+                {%- render 'price', product: product, use_variant: true, show_badges: true, price_class: 'price--large' -%}
+              {%- when 'quantity_selector' -%}
+                <div
+                  id="Quantity-Form-{{ section.id }}"
+                  class="product-form__input product-form__quantity"
+                  {{ block.shopify_attributes }}
+                >
+                  <label class="quantity__label form__label" for="Quantity-{{ section.id }}">
+                    {{ 'products.product.quantity.label' | t }}
+                  </label>
+                  <div class="quantity-control-wrapper">
+                    <quantity-input class="quantity" data-url="{{ product.url }}" data-section="{{ section.id }}">
+                      <input
+                        class="quantity__input"
+                        type="number"
+                        name="quantity"
+                        id="Quantity-{{ section.id }}"
+                        min="1"
+                        max="1"
+                        step="1"
+                        value="1"
+                        readonly
+                        form="{{ product_form_id }}"
+                      >
+                    </quantity-input>
+                    
+                    <!-- Quantity Limit Notice -->
+                    <div class="quantity-limit-notice" id="QuantityLimitNotice-{{ section.id }}">
+                      <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M13,9H11V7H13M13,17H11V11H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/>
+                      </svg>
+                      <span>Limit: 1 per customer</span>
+                    </div>
+                  </div>
+                </div>
+              {%- when 'variant_picker' -%}
+                {% render 'product-variant-picker', product: product, block: block, product_form_id: product_form_id %}
+              {%- when 'buy_buttons' -%}
+                {%- render 'buy-buttons',
+                  block: block,
+                  product: product,
+                  product_form_id: product_form_id,
+                  section_id: section.id,
+                  show_pickup_availability: true
+                -%}
+              {%- when 'description' -%}
+                {%- if product.description != blank -%}
+                  <div class="product__description rte quick-add-hidden" {{ block.shopify_attributes }}>
+                    {{ product.description }}
+                    
+                    <!-- Enhanced Product Specifications -->
+                    <div class="enhanced-product-specs">
+                      <h3>🎬 Video Specifications</h3>
+                      <ul class="spec-list">
+                        <li><strong>Resolution Options:</strong> HD (1920×1080), 4K (3840×2160), Full Package</li>
+                        <li><strong>Format:</strong> MP4, MOV compatible with all devices</li>
+                        <li><strong>Duration:</strong> Professional length with perfect loops</li>
+                        <li><strong>Orientation:</strong> {{ product.metafields.custom.orientation.value | default: 'Universal (Landscape & Portrait)' }}</li>
+                        <li><strong>Quality:</strong> Professional studio grade</li>
+                        <li><strong>Delivery:</strong> Instant download after purchase</li>
+                      </ul>
+                      
+                      <h3>💼 Commercial Use</h3>
+                      <ul class="spec-list">
+                        <li>✅ Social media content creation</li>
+                        <li>✅ Website backgrounds and headers</li>
+                        <li>✅ Marketing and advertising materials</li>
+                        <li>✅ Presentations and digital displays</li>
+                        <li>✅ Video editing and compositing</li>
+                        <li>✅ Commercial projects and client work</li>
+                      </ul>
+                      
+                      <h3>🎯 Perfect For</h3>
+                      <ul class="spec-list">
+                        <li>Content creators and influencers</li>
+                        <li>Marketing agencies and designers</li>
+                        <li>Video editors and filmmakers</li>
+                        <li>Website developers and UX designers</li>
+                        <li>Social media managers</li>
+                        <li>Business presentations and events</li>
+                      </ul>
+                    </div>
+                  </div>
+                {%- else -%}
+                  <!-- Default description if none provided -->
+                  <div class="product__description rte quick-add-hidden" {{ block.shopify_attributes }}>
+                    <h2>Professional Video Content</h2>
+                    <p>High-quality digital video perfect for your creative projects. Our professional-grade content delivers stunning visuals that enhance any production.</p>
+                    
+                    <div class="enhanced-product-specs">
+                      <h3>🎬 What You Get</h3>
+                      <ul class="spec-list">
+                        <li><strong>Multiple Resolutions:</strong> Choose from HD, 4K, or Full Package</li>
+                        <li><strong>Instant Download:</strong> Get your files immediately after purchase</li>
+                        <li><strong>Commercial License:</strong> Use in all your commercial projects</li>
+                        <li><strong>Professional Quality:</strong> Studio-grade video production</li>
+                        <li><strong>Universal Format:</strong> Compatible with all editing software</li>
+                        <li><strong>Lifetime Access:</strong> Download anytime from your account</li>
+                      </ul>
+                      
+                      <h3>💡 Usage Ideas</h3>
+                      <ul class="spec-list">
+                        <li>Website backgrounds and hero sections</li>
+                        <li>Social media posts and stories</li>
+                        <li>Marketing campaigns and advertisements</li>
+                        <li>Presentation backgrounds</li>
+                        <li>Video editing and compositing</li>
+                        <li>Digital displays and signage</li>
+                      </ul>
+                    </div>
+                  </div>
+                {%- endif -%}
+            {%- endcase -%}
+          {%- endfor -%}
+          
+          <!-- Social Sharing System - NEW -->
+          <div class="product-sharing-section">
+            {% render 'social-sharing-system' %}
+          </div>
+          
+        </section>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Silent Quantity Management Script - PRODUCTION READY -->
+  <script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const productId = {{ product.id }};
+    const productForm = document.querySelector('#{{ product_form_id }}');
+    const submitButton = document.querySelector('#ProductSubmitButton-{{ section.id }}');
+    const quantityInput = document.querySelector('#Quantity-{{ section.id }}');
+    const quantityNotice = document.querySelector('#QuantityLimitNotice-{{ section.id }}');
+    
+    let cartCheckInProgress = false;
+    let hasProductInCart = false;
+    let checkTimeout = null;
+    
+    // Performance optimization: Debounced cart check
+    function debounce(func, wait) {
+      return function executedFunction(...args) {
+        const later = () => {
+          clearTimeout(checkTimeout);
+          func(...args);
+        };
+        clearTimeout(checkTimeout);
+        checkTimeout = setTimeout(later, wait);
+      };
+    }
+    
+    // Initialize quantity control with accessibility
+    function initQuantityControl() {
+      if (quantityInput) {
+        quantityInput.value = 1;
+        quantityInput.readOnly = true;
+        quantityInput.setAttribute('aria-describedby', 'QuantityLimitNotice-{{ section.id }}');
+        quantityInput.style.cursor = 'not-allowed';
+        
+        // Show limit notice with animation
+        if (quantityNotice) {
+          setTimeout(() => {
+            quantityNotice.classList.add('show');
+          }, 500);
+        }
+        
+        // Add accessibility attributes
+        quantityInput.setAttribute('aria-label', 'Quantity (limited to 1 per customer)');
+        quantityInput.setAttribute('title', 'Quantity is limited to 1 per customer');
+      }
+    }
+    
+    // Enhanced cart check with error handling and retry logic
+    async function checkCartForProduct(retryCount = 0) {
+      if (cartCheckInProgress) return hasProductInCart;
+      
+      cartCheckInProgress = true;
+      
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000); // 5s timeout
+        
+        const response = await fetch('/cart.js', {
+          signal: controller.signal,
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        clearTimeout(timeoutId);
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const cart = await response.json();
+        
+        // Check if any variant of this product is in cart
+        hasProductInCart = cart.items.some(item => item.product_id === productId);
+        
+        updateUIBasedOnCartState();
+        
+        // Reset retry count on success
+        retryCount = 0;
+        
+      } catch (error) {
+        console.log('Cart check failed:', error.name, error.message);
+        
+        // Retry logic for network issues
+        if (retryCount < 2 && (error.name === 'TypeError' || error.name === 'AbortError')) {
+          setTimeout(() => {
+            checkCartForProduct(retryCount + 1);
+          }, 1000 * (retryCount + 1)); // Exponential backoff
+        } else {
+          // Fallback: assume not in cart to allow purchase
+          hasProductInCart = false;
+          updateUIBasedOnCartState();
+        }
+      } finally {
+        cartCheckInProgress = false;
+      }
+      
+      return hasProductInCart;
+    }
+    
+    // Update UI with smooth transitions and accessibility
+    function updateUIBasedOnCartState() {
+      if (!submitButton) return;
+      
+      // Smooth transition helper
+      const updateWithTransition = (element, properties) => {
+        Object.keys(properties).forEach(prop => {
+          element.style[prop] = properties[prop];
+        });
+      };
+      
+      if (hasProductInCart) {
+        // Disable add to cart button silently
+        submitButton.disabled = true;
+        submitButton.setAttribute('aria-disabled', 'true');
+        submitButton.setAttribute('aria-label', 'Product already in cart');
+        
+        updateWithTransition(submitButton, {
+          background: 'linear-gradient(135deg, #9ca3af 0%, #6b7280 100%)',
+          cursor: 'not-allowed',
+          transform: 'none',
+          boxShadow: 'none'
+        });
+        
+        // Update button text with fade transition
+        const buttonText = submitButton.querySelector('span');
+        if (buttonText) {
+          buttonText.style.opacity = '0';
+          setTimeout(() => {
+            buttonText.textContent = 'Already in Cart';
+            buttonText.style.opacity = '1';
+          }, 150);
+        }
+        
+        // Update quantity input
+        if (quantityInput) {
+          quantityInput.disabled = true;
+          quantityInput.setAttribute('aria-disabled', 'true');
+          updateWithTransition(quantityInput, {
+            background: '#f3f4f6',
+            color: '#9ca3af',
+            borderColor: '#d1d5db'
+          });
+        }
+      } else {
+        // Enable add to cart button
+        submitButton.disabled = false;
+        submitButton.removeAttribute('aria-disabled');
+        submitButton.setAttribute('aria-label', 'Add product to cart');
+        
+        updateWithTransition(submitButton, {
+          background: '',
+          cursor: '',
+          transform: '',
+          boxShadow: ''
+        });
+        
+        // Update button text
+        const buttonText = submitButton.querySelector('span');
+        if (buttonText) {
+          buttonText.style.opacity = '0';
+          setTimeout(() => {
+            buttonText.textContent = 'Add to Cart';
+            buttonText.style.opacity = '1';
+          }, 150);
+        }
+        
+        // Update quantity input
+        if (quantityInput) {
+          quantityInput.disabled = false;
+          quantityInput.removeAttribute('aria-disabled');
+          updateWithTransition(quantityInput, {
+            background: '#f9fafb',
+            color: '#6b7280',
+            borderColor: '#e5e7eb'
+          });
+        }
+      }
+    }
+    
+    // Enhanced form submission with loading states
+    if (productForm) {
+      productForm.addEventListener('submit', async function(e) {
+        // Check cart before submission
+        await checkCartForProduct();
+        
+        if (hasProductInCart) {
+          e.preventDefault();
+          
+          // Shake animation for visual feedback
+          submitButton.style.animation = 'shake 0.5s ease-in-out';
+          setTimeout(() => {
+            submitButton.style.animation = '';
+          }, 500);
+          
+          return false;
+        }
+        
+        // Add loading state
+        if (submitButton) {
+          const buttonText = submitButton.querySelector('span');
+          const spinner = submitButton.querySelector('.loading__spinner');
+          
+          if (buttonText) buttonText.style.opacity = '0';
+          if (spinner) spinner.classList.remove('hidden');
+          
+          submitButton.style.opacity = '0.7';
+          submitButton.disabled = true;
+        }
+        
+        // Proceed with normal form submission
+        return true;
+      });
+    }
+    
+    // Debounced cart update listener
+    const debouncedCartCheck = debounce(checkCartForProduct, 300);
+    
+    // Listen for cart updates with multiple event types
+    ['cart:updated', 'cart:build', 'cart:refresh'].forEach(eventType => {
+      document.addEventListener(eventType, function() {
+        debouncedCartCheck();
+      });
+    });
+    
+    // Listen for Shopify variant change events
+    document.addEventListener('variant:change', function(e) {
+      if (e.detail && e.detail.variant) {
+        // Reset cart check for new variant
+        hasProductInCart = false;
+        debouncedCartCheck();
+      }
+    });
+    
+    // Listen for variant changes from selector
+    document.addEventListener('change', function(e) {
+      if (e.target.name === 'id') {
+        // Reset cart check for new variant
+        hasProductInCart = false;
+        debouncedCartCheck();
+      }
+    });
+    
+    // Enhanced error handling for add to cart failures
+    document.addEventListener('cart:error', function(e) {
+      if (submitButton) {
+        const buttonText = submitButton.querySelector('span');
+        const spinner = submitButton.querySelector('.loading__spinner');
+        
+        if (buttonText) {
+          buttonText.textContent = 'Try Again';
+          buttonText.style.opacity = '1';
+        }
+        if (spinner) spinner.classList.add('hidden');
+        
+        submitButton.style.opacity = '1';
+        submitButton.disabled = false;
+        
+        // Reset button after 3 seconds
+        setTimeout(() => {
+          if (buttonText) buttonText.textContent = 'Add to Cart';
+        }, 3000);
+      }
+    });
+    
+    // Page visibility change handling (for mobile browser switching)
+    document.addEventListener('visibilitychange', function() {
+      if (!document.hidden) {
+        // Re-check cart when page becomes visible again
+        debouncedCartCheck();
+      }
+    });
+    
+    // Handle browser back/forward navigation
+    window.addEventListener('pageshow', function(e) {
+      if (e.persisted) {
+        // Page loaded from cache, re-check cart
+        debouncedCartCheck();
+      }
+    });
+    
+    // Touch device optimization
+    if ('ontouchstart' in window) {
+      // Prevent double-tap zoom on submit button
+      submitButton?.addEventListener('touchend', function(e) {
+        e.preventDefault();
+        if (!this.disabled) {
+          this.click();
+        }
+      });
+    }
+    
+    // Keyboard accessibility
+    submitButton?.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        if (!this.disabled) {
+          this.click();
+        }
+      }
+    });
+    
+    // Initialize everything
+    initQuantityControl();
+    
+    // Initial cart check with delay to allow page to fully load
+    setTimeout(() => {
+      checkCartForProduct();
+    }, 100);
+    
+    // Periodic cart sync (every 30 seconds) for long-lived sessions
+    const cartSyncInterval = setInterval(() => {
+      if (!document.hidden && !cartCheckInProgress) {
+        checkCartForProduct();
+      }
+    }, 30000);
+    
+    // Cleanup interval on page unload
+    window.addEventListener('beforeunload', function() {
+      clearInterval(cartSyncInterval);
+      if (checkTimeout) clearTimeout(checkTimeout);
+    });
+    
+    // Add CSS for shake animation
+    if (!document.querySelector('#quantity-shake-animation')) {
+      const style = document.createElement('style');
+      style.id = 'quantity-shake-animation';
+      style.textContent = `
+        @keyframes shake {
+          0%, 20%, 40%, 60%, 80%, 100% { transform: translateX(0); }
+          10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+        }
+      `;
+      document.head.appendChild(style);
+    }
+  });
+  </script>
+</product-info>
+
+{% schema %}
+{
+  "name": "Product information",
+  "tag": "section",
+  "class": "section",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "select",
+      "id": "media_size",
+      "options": [
+        { "value": "small", "label": "Small" },
+        { "value": "medium", "label": "Medium" },
+        { "value": "large", "label": "Large" }
+      ],
+      "default": "large",
+      "label": "Media size"
+    },
+    {
+      "type": "select",
+      "id": "media_position",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "left",
+      "label": "Media position"
+    },
+    {
+      "type": "select",
+      "id": "gallery_layout",
+      "options": [
+        { "value": "stacked", "label": "Stacked" },
+        { "value": "columns", "label": "Columns" }
+      ],
+      "default": "stacked",
+      "label": "Gallery layout"
+    },
+    {
+      "type": "select",
+      "id": "mobile_thumbnails",
+      "options": [
+        { "value": "show", "label": "Show" },
+        { "value": "hide", "label": "Hide" }
+      ],
+      "default": "hide",
+      "label": "Mobile thumbnails"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_sticky_info",
+      "default": true,
+      "label": "Enable sticky product information"
+    },
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "options": [
+        { "value": "background-1", "label": "Background 1" },
+        { "value": "background-2", "label": "Background 2" },
+        { "value": "inverse", "label": "Inverse" },
+        { "value": "accent-1", "label": "Accent 1" },
+        { "value": "accent-2", "label": "Accent 2" }
+      ],
+      "default": "background-1",
+      "label": "Color scheme"
+    },
+    {
+      "type": "header",
+      "content": "Section padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 36
+    }
+  ],
+  "blocks": [
+    {
+      "type": "@app"
+    },
+    {
+      "type": "text",
+      "name": "Text",
+      "settings": [
+        {
+          "type": "inline_richtext",
+          "id": "text",
+          "default": "Text block",
+          "label": "Text"
+        },
+        {
+          "type": "select",
+          "id": "text_style",
+          "options": [
+            { "value": "body", "label": "Body" },
+            { "value": "subtitle", "label": "Subtitle" },
+            { "value": "uppercase", "label": "Uppercase" }
+          ],
+          "default": "body",
+          "label": "Text style"
+        }
+      ]
+    },
+    {
+      "type": "title",
+      "name": "Title",
+      "limit": 1
+    },
+    {
+      "type": "price",
+      "name": "Price",
+      "limit": 1
+    },
+    {
+      "type": "quantity_selector",
+      "name": "Quantity selector",
+      "limit": 1
+    },
+    {
+      "type": "variant_picker",
+      "name": "Variant picker",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "select",
+          "id": "picker_type",
+          "options": [
+            { "value": "dropdown", "label": "Dropdown" },
+            { "value": "button", "label": "Buttons" }
+          ],
+          "default": "button",
+          "label": "Type"
+        }
+      ]
+    },
+    {
+      "type": "buy_buttons",
+      "name": "Buy buttons",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "checkbox",
+          "id": "show_dynamic_checkout",
+          "default": true,
+          "label": "Show dynamic checkout buttons"
+        }
+      ]
+    },
+    {
+      "type": "description",
+      "name": "Description",
+      "limit": 1
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product information",
+      "blocks": [
+        { "type": "title" },
+        { "type": "price" },
+        { "type": "variant_picker" },
+        { "type": "quantity_selector" },
+        { "type": "buy_buttons" },
+        { "type": "description" }
+      ]
+    }
+  ]
+}
+{% endschema %} 

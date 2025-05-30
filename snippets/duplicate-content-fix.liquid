@@ -1,0 +1,49 @@
+{%- comment -%}
+  Duplicate Content Fix for SEO
+  Prevents duplicate content issues from tracking parameters - SAFE VERSION
+{%- endcomment -%}
+
+{%- assign current_url = request.url | downcase -%}
+
+{%- comment -%} Only target very specific problematic tracking parameters {%- endcomment -%}
+{%- assign is_problematic = false -%}
+{%- if current_url contains 'wpm@' -%}
+  {%- assign is_problematic = true -%}
+{%- elsif current_url contains 'web-pixel-shopify-custom-pixel' -%}
+  {%- assign is_problematic = true -%}
+{%- elsif current_url contains 'sandbox/modern' -%}
+  {%- assign is_problematic = true -%}
+{%- elsif current_url contains 'pr_prod_strat=' and current_url contains 'pr_rec_id=' -%}
+  {%- assign is_problematic = true -%}
+{%- endif -%}
+
+{%- if is_problematic -%}
+  
+  {%- comment -%} Add noindex only for confirmed tracking URLs {%- endcomment -%}
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="googlebot" content="noindex,nofollow">
+  
+  {%- comment -%} Build clean URL {%- endcomment -%}
+  {%- assign clean_url = shop.url -%}
+  {%- if template contains 'product' -%}
+    {%- assign clean_url = shop.url | append: product.url | split: '?' | first -%}
+  {%- elsif template contains 'collection' -%}
+    {%- assign clean_url = shop.url | append: collection.url | split: '?' | first -%}
+  {%- elsif template contains 'page' -%}
+    {%- assign clean_url = shop.url | append: page.url | split: '?' | first -%}
+  {%- else -%}
+    {%- assign clean_url = shop.url | append: request.path | split: '?' | first -%}
+  {%- endif -%}
+  
+  {%- comment -%} JavaScript redirect {%- endcomment -%}
+  <script>
+    // Immediate redirect for confirmed duplicate content URLs
+    if (window.location.href !== "{{ clean_url }}") {
+      window.location.replace("{{ clean_url }}");
+    }
+  </script>
+  
+  {%- comment -%} HTTP-EQUIV refresh as backup {%- endcomment -%}
+  <meta http-equiv="refresh" content="0;url={{ clean_url }}">
+  
+{%- endif -%} 

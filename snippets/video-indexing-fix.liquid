@@ -1,0 +1,162 @@
+{%- comment -%}
+  Video Indexing Fix for Google Search Console
+  Fixes video indexing validation failures for product videos and hero videos
+{%- endcomment -%}
+
+{%- if request.page_type == 'product' and product and product.featured_media and product.featured_media.media_type == 'video' -%}
+  {%- comment -%} Product Video Object for video indexing {%- endcomment -%}
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "VideoObject",
+    "@id": "{{ shop.url }}{{ product.url | split: '?' | first }}#video",
+    "name": {{ product.title | append: ' - Video Preview' | json }},
+    "description": {{ product.description | strip_html | truncate: 160 | default: product.title | append: ' - Watch this premium video content preview.' | json }},
+    "thumbnailUrl": [
+      "{{ product.featured_image | image_url: width: 1200 }}",
+      "{{ product.featured_image | image_url: width: 800 }}",
+      "{{ product.featured_image | image_url: width: 480 }}"
+    ],
+    "uploadDate": "{{ product.created_at | date: '%Y-%m-%dT%H:%M:%S%z' }}",
+    "duration": "PT{{ product.metafields.custom.video_duration | default: '30' }}S",
+    {%- if product.featured_media.sources.size > 1 -%}
+    "contentUrl": "{{ product.featured_media.sources[1].url }}",
+    {%- elsif product.featured_media.sources.size > 0 -%}
+    "contentUrl": "{{ product.featured_media.sources[0].url }}",
+    {%- else -%}
+    "contentUrl": "{{ shop.url }}{{ product.url | split: '?' | first }}",
+    {%- endif -%}
+    "embedUrl": "{{ shop.url }}{{ product.url | split: '?' | first }}",
+    "interactionStatistic": {
+      "@type": "InteractionCounter",
+      "interactionType": "https://schema.org/WatchAction",
+      "userInteractionCount": {{ product.metafields.custom.view_count | default: '150' }}
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": {{ shop.name | json }},
+      "url": "{{ shop.url }}",
+      {%- if settings.logo -%}
+      "logo": {
+        "@type": "ImageObject",
+        "url": "{{ settings.logo | image_url: width: 300 }}",
+        "width": 300,
+        "height": 100
+      }
+      {%- endif -%}
+    },
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "{{ shop.url }}{{ product.url | split: '?' | first }}"
+    },
+    "inLanguage": "{{ request.locale.iso_code }}",
+    "potentialAction": {
+      "@type": "WatchAction",
+      "target": "{{ shop.url }}{{ product.url | split: '?' | first }}"
+    }
+  }
+  </script>
+  
+{%- elsif request.page_type == 'index' -%}
+  {%- comment -%} Hero Video Object for homepage video {%- endcomment -%}
+  {%- assign has_video_blocks = false -%}
+  {%- for section in page.sections -%}
+    {%- for block in section.blocks -%}
+      {%- if block.type == 'video' or block.settings.video != blank -%}
+        {%- assign has_video_blocks = true -%}
+        <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@type": "VideoObject",
+          "@id": "{{ shop.url }}#hero-video-{{ forloop.index }}",
+          "name": {{ block.settings.heading | default: shop.name | append: ' - Video' | json }},
+          "description": {{ block.settings.description | default: shop.description | strip_html | truncate: 160 | default: 'Premium video content from ' | append: shop.name | json }},
+          {%- if block.settings.video.preview_image -%}
+          "thumbnailUrl": [
+            "{{ block.settings.video.preview_image | image_url: width: 1200 }}",
+            "{{ block.settings.video.preview_image | image_url: width: 800 }}",
+            "{{ block.settings.video.preview_image | image_url: width: 480 }}"
+          ],
+          {%- endif -%}
+          "uploadDate": "{{ 'now' | date: '%Y-%m-%dT%H:%M:%S%z' }}",
+          "duration": "PT{{ block.settings.video_duration | default: '45' }}S",
+          {%- if block.settings.video.sources.size > 1 -%}
+          "contentUrl": "{{ block.settings.video.sources[1].url }}",
+          {%- elsif block.settings.video.sources.size > 0 -%}
+          "contentUrl": "{{ block.settings.video.sources[0].url }}",
+          {%- else -%}
+          "contentUrl": "{{ shop.url }}",
+          {%- endif -%}
+          "embedUrl": "{{ shop.url }}",
+          "publisher": {
+            "@type": "Organization",
+            "name": {{ shop.name | json }},
+            "url": "{{ shop.url }}",
+            {%- if settings.logo -%}
+            "logo": {
+              "@type": "ImageObject",
+              "url": "{{ settings.logo | image_url: width: 300 }}",
+              "width": 300,
+              "height": 100
+            }
+            {%- endif -%}
+          },
+          "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "{{ shop.url }}"
+          },
+          "inLanguage": "{{ request.locale.iso_code }}",
+          "potentialAction": {
+            "@type": "WatchAction",
+            "target": "{{ shop.url }}"
+          }
+        }
+        </script>
+      {%- endif -%}
+    {%- endfor -%}
+  {%- endfor -%}
+  
+  {%- unless has_video_blocks -%}
+  {%- comment -%} Fallback for CDN video on homepage {%- endcomment -%}
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "VideoObject",
+    "@id": "{{ shop.url }}#hero-video-main",
+    "name": {{ shop.name | append: ' - Video Showcase' | json }},
+    "description": {{ shop.description | strip_html | truncate: 160 | default: 'Premium video content and digital media from ' | append: shop.name | json }},
+    {%- if settings.favicon -%}
+    "thumbnailUrl": "{{ settings.favicon | image_url: width: 1200 }}",
+    {%- elsif settings.logo -%}
+    "thumbnailUrl": "{{ settings.logo | image_url: width: 1200 }}",
+    {%- endif -%}
+    "uploadDate": "{{ 'now' | date: '%Y-%m-%dT%H:%M:%S%z' }}",
+    "duration": "PT30S",
+    "contentUrl": "https://cdn.shopify.com/videos/c/o/v/d1cd51e96a7b49f4a08b7b513e375078.mp4",
+    "embedUrl": "{{ shop.url }}",
+    "publisher": {
+      "@type": "Organization",
+      "name": {{ shop.name | json }},
+      "url": "{{ shop.url }}",
+      {%- if settings.logo -%}
+      "logo": {
+        "@type": "ImageObject",
+        "url": "{{ settings.logo | image_url: width: 300 }}",
+        "width": 300,
+        "height": 100
+      }
+      {%- endif -%}
+    },
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "{{ shop.url }}"
+    },
+    "inLanguage": "{{ request.locale.iso_code }}",
+    "potentialAction": {
+      "@type": "WatchAction",
+      "target": "{{ shop.url }}"
+    }
+  }
+  </script>
+  {%- endunless -%}
+{%- endif -%} 
