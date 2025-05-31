@@ -18,21 +18,21 @@
       if product.featured_image
         assign share_image = product.featured_image | img_url: '1200x630'
       endif
-      assign share_text = 'Посмотри это крутое видео для креативов: ' | append: product.title | append: ' 🎬'
+      assign share_text = 'Check out this awesome video for creatives: ' | append: product.title | append: ' 🎬'
       
     when 'collection'
-      assign share_title = collection.title | append: ' - Видео коллекция | ' | append: shop.name
-      assign share_description = collection.description | strip_html | truncate: 160 | default: 'Профессиональные видео для креативных проектов'
+      assign share_title = collection.title | append: ' - Video Collection | ' | append: shop.name
+      assign share_description = collection.description | strip_html | truncate: 160 | default: 'Professional videos for creative projects'
       if collection.featured_image
         assign share_image = collection.featured_image | img_url: '1200x630'
       endif
-      assign share_text = 'Крутая коллекция видео: ' | append: collection.title | append: ' 🎥 Идеально для проектов!'
+      assign share_text = 'Amazing video collection: ' | append: collection.title | append: ' 🎥 Perfect for projects!'
       
     else
-      assign share_title = shop.name | append: ' - Профессиональные видео для креативов'
-      assign share_description = 'Огромная библиотека качественных видео для маркетинга, социальных сетей и креативных проектов'
+      assign share_title = shop.name | append: ' - Professional Videos for Creatives'
+      assign share_description = 'Huge library of high-quality videos for marketing, social media and creative projects'
       assign share_image = settings.logo | img_url: '1200x630'
-      assign share_text = 'Нашел отличный магазин видео для креативов! 🎬 Куча качественного контента для проектов 🔥'
+      assign share_text = 'Found an amazing video store for creatives! 🎬 Tons of quality content for projects 🔥'
   endcase
   
   if share_image == blank and settings.share_image
@@ -74,14 +74,14 @@
     <h3 class="social-sharing__title">
       {% case page_type %}
         {% when 'product' %}
-          🎬 Поделиться видео
+          🎬 Share Video
         {% when 'collection' %}
-          🎥 Поделиться коллекцией  
+          🎥 Share Collection
         {% else %}
-          🏪 Поделиться магазином
+          🏪 Share Store
       {% endcase %}
     </h3>
-    <p class="social-sharing__subtitle">Отправь друзьям или опубликуй в соцсетях</p>
+    <p class="social-sharing__subtitle">Send to friends or share on social media</p>
   </div>
   
   <div class="social-sharing__buttons">
@@ -106,7 +106,7 @@
       <svg viewBox="0 0 24 24" fill="currentColor">
         <path d="M15.684 0H8.316C1.592 0 0 1.592 0 8.316v7.368C0 22.408 1.592 24 8.316 24h7.368C22.408 24 24 22.408 24 15.684V8.316C24 1.592 22.408 0 15.684 0zm3.692 17.123h-1.744c-.66 0-.862-.525-2.049-1.714-1.033-1.01-1.49-.856-1.49.235v1.714c-.097.484-.516.484-1.317.484-2.257 0-4.693-1.368-6.442-3.908C4.456 9.485 3.685 7.116 6.336 7.116c.957 0 1.31.097 1.31.097 1.31 1.464 1.464 3.39 2.257 1.712.33-.7 0-3.097-1.317-3.097-.66 0 .33-1.23 1.744-1.23 1.213 0 2.05.33 2.05 1.714v2.355c.33.33 1.02-.097 2.05-1.23 1.117-1.23 1.744-2.453 1.744-2.453.66-1.23 1.744-.66 1.744.33 0 .858-2.05 3.195-2.05 3.195 1.317 1.317 2.744 2.404 2.744 3.097 0 .856-.825 1.23-1.413 1.23z"/>
       </svg>
-      ВКонтакте
+      VK
     </button>
     
     <!-- Facebook -->
@@ -130,7 +130,7 @@
       <svg viewBox="0 0 24 24" fill="currentColor">
         <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
       </svg>
-      Копировать ссылку
+      Copy Link
     </button>
   </div>
   
@@ -393,7 +393,7 @@ function getSharingData() {
 
 function showCopyNotification() {
   const notification = document.createElement('div');
-  notification.textContent = '✅ Ссылка скопирована!';
+  notification.textContent = '✅ Link copied!';
   notification.style.cssText = `
     position: fixed;
     bottom: 20px;

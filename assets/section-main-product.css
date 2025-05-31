@@ -1,14 +1,205 @@
-product-info {
-  display: block;
+/* ============================================================================
+   RESPONSIVE BREAKPOINT SYSTEM - CSS INTEGRATION + SCROLLBAR FIXES
+   ============================================================================ */
+
+/* CRITICAL: Prevent all horizontal scrollbars */
+* {
+  box-sizing: border-box;
 }
 
+html, body {
+  overflow-x: hidden !important;
+  max-width: 100vw !important;
+}
+
+body {
+  min-width: 320px;
+}
+
+.page-width {
+  max-width: 100% !important;
+  width: 100% !important;
+  overflow-x: hidden !important;
+  box-sizing: border-box;
+}
+
+/* Global responsive container */
+product-info {
+  display: block;
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
+/* Base responsive layout */
 .product {
   margin: 0;
+  width: 100%;
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+  box-sizing: border-box;
 }
  
 .product.grid {
   gap: 0;
 }
+
+/* Mobile-first responsive layout */
+product-info.mobile-layout .product {
+  flex-direction: column;
+}
+
+product-info.mobile-layout .product__media-wrapper,
+product-info.mobile-layout .product__info-wrapper {
+  width: 100% !important;
+  max-width: 100% !important;
+  flex: none !important;
+}
+
+product-info.mobile-layout .product__media-wrapper {
+  margin-bottom: 1.5rem !important;
+  order: 1;
+}
+
+product-info.mobile-layout .product__info-wrapper {
+  padding: 0 !important;
+  order: 2;
+}
+
+/* Tablet responsive layout */
+product-info.tablet-layout .product {
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 2rem;
+}
+
+product-info.tablet-layout .product__media-wrapper {
+  width: 55% !important;
+  flex: 0 0 55% !important;
+  order: 1;
+}
+
+product-info.tablet-layout .product__info-wrapper {
+  width: 40% !important;
+  flex: 0 0 40% !important;
+  padding: 0 0 0 2rem !important;
+  order: 2;
+}
+
+/* Desktop responsive layout */
+product-info.desktop-layout .product {
+  flex-direction: row;
+  flex-wrap: nowrap;
+  gap: 3rem;
+}
+
+product-info.desktop-layout .product__media-wrapper {
+  width: 60% !important;
+  flex: 0 0 60% !important;
+  order: 1;
+}
+
+product-info.desktop-layout .product__info-wrapper {
+  width: 35% !important;
+  flex: 0 0 35% !important;
+  padding: 0 0 0 3rem !important;
+  order: 2;
+}
+
+/* Text orientation fixes for all breakpoints */
+product-info * {
+  writing-mode: horizontal-tb !important;
+  text-orientation: mixed !important;
+  direction: ltr !important;
+}
+
+/* Enhanced drawer responsive behavior */
+header-drawer.mobile-drawer,
+menu-drawer.mobile-drawer {
+  --drawer-width: 100vw;
+  --drawer-max-width: 100vw;
+}
+
+header-drawer.tablet-drawer,
+menu-drawer.tablet-drawer {
+  --drawer-width: 400px;
+  --drawer-max-width: 400px;
+}
+
+header-drawer.desktop-drawer,
+menu-drawer.desktop-drawer {
+  --drawer-width: 450px;
+  --drawer-max-width: 450px;
+}
+
+/* ============================================================================
+   MEDIA GALLERY RESPONSIVE FIXES
+   ============================================================================ */
+
+.simple-media-gallery {
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.main-media-display {
+  width: 100%;
+  max-width: 100%;
+  aspect-ratio: 16/9;
+  background: #f8f9fa;
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.main-media-display img,
+.main-media-display video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+}
+
+/* Thumbnail navigation */
+.thumbnail-navigation {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  overflow-x: auto;
+  padding: 0.5rem 0;
+}
+
+.thumbnail-item {
+  flex: 0 0 auto;
+  width: 80px;
+  height: 60px;
+  border-radius: 4px;
+  overflow: hidden;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: border-color 0.2s ease;
+}
+
+.thumbnail-item.active {
+  border-color: #2563eb;
+}
+
+.thumbnail-item img,
+.thumbnail-item video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ============================================================================
+   PROFESSIONAL PRODUCT LAYOUT SYSTEM
+   ============================================================================ */
 
 .product--no-media {
   max-width: 57rem;
@@ -17,8 +208,11 @@ product-info {
 
 .product__media-wrapper {
   padding-left: 0;
+  position: relative;
+  overflow: hidden;
 }
 
+/* Enhanced breakpoint-specific rules */
 @media screen and (min-width: 750px) {
   .product__column-sticky {
     display: block;
@@ -31,19 +225,20 @@ product-info {
     padding-right: var(--media-shadow-horizontal-offset);
   }
 
-  .product__info-wrapper {
+  /* Only apply if not using custom responsive layout */
+  product-info:not(.mobile-layout):not(.tablet-layout):not(.desktop-layout) .product__info-wrapper {
     padding: 0 0 0 5rem;
   }
 
-  .product__info-wrapper--extra-padding {
+  product-info:not(.mobile-layout):not(.tablet-layout):not(.desktop-layout) .product__info-wrapper--extra-padding {
     padding: 0 0 0 8rem;
   }
 
-  .product--right .product__info-wrapper {
+  product-info:not(.mobile-layout):not(.tablet-layout):not(.desktop-layout) .product--right .product__info-wrapper {
     padding: 0 5rem 0 0;
   }
 
-  .product--right .product__info-wrapper--extra-padding {
+  product-info:not(.mobile-layout):not(.tablet-layout):not(.desktop-layout) .product--right .product__info-wrapper--extra-padding {
     padding: 0 8rem 0 0;
   }
 
@@ -61,33 +256,38 @@ product-info {
 }
 
 @media screen and (min-width: 990px) {
-  .product--large:not(.product--no-media) .product__media-wrapper {
+  /* Desktop enhancements - only for non-custom layouts */
+  product-info:not(.mobile-layout):not(.tablet-layout):not(.desktop-layout) .product--large:not(.product--no-media) .product__media-wrapper {
     max-width: 65%;
     width: calc(65% - var(--grid-desktop-horizontal-spacing) / 2);
   }
 
-  .product--large:not(.product--no-media) .product__info-wrapper {
+  product-info:not(.mobile-layout):not(.tablet-layout):not(.desktop-layout) .product--large:not(.product--no-media) .product__info-wrapper {
     padding: 0 0 0 4rem;
     max-width: 35%;
     width: calc(35% - var(--grid-desktop-horizontal-spacing) / 2);
   }
 
-  .product--large:not(.product--no-media).product--right .product__info-wrapper {
+  product-info:not(.mobile-layout):not(.tablet-layout):not(.desktop-layout) .product--large:not(.product--no-media).product--right .product__info-wrapper {
     padding: 0 4rem 0 0;
   }
 
-  .product--medium:not(.product--no-media) .product__media-wrapper,
-  .product--small:not(.product--no-media) .product__info-wrapper {
+  product-info:not(.mobile-layout):not(.tablet-layout):not(.desktop-layout) .product--medium:not(.product--no-media) .product__media-wrapper,
+  product-info:not(.mobile-layout):not(.tablet-layout):not(.desktop-layout) .product--small:not(.product--no-media) .product__info-wrapper {
     max-width: 55%;
     width: calc(55% - var(--grid-desktop-horizontal-spacing) / 2);
   }
 
-  .product--medium:not(.product--no-media) .product__info-wrapper,
-  .product--small:not(.product--no-media) .product__media-wrapper {
+  product-info:not(.mobile-layout):not(.tablet-layout):not(.desktop-layout) .product--medium:not(.product--no-media) .product__info-wrapper,
+  product-info:not(.mobile-layout):not(.tablet-layout):not(.desktop-layout) .product--small:not(.product--no-media) .product__media-wrapper {
     max-width: 45%;
     width: calc(45% - var(--grid-desktop-horizontal-spacing) / 2);
   }
 }
+
+/* ============================================================================
+   ENHANCED FORM AND BUTTON STYLING  
+   ============================================================================ */
 
 /* Dynamic checkout */
 

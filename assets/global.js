@@ -418,24 +418,150 @@ Shopify.CountryProvinceSelector.prototype = {
   },
 };
 
+// ============================================================================
+// RESPONSIVE BREAKPOINT SYSTEM - PROFESSIONAL VIDEO STORE
+// ============================================================================
+
+class ResponsiveBreakpointManager {
+  constructor() {
+    this.breakpoints = {
+      mobile: { min: 0, max: 749 },
+      tablet: { min: 750, max: 989 }, 
+      desktop: { min: 990, max: Infinity }
+    };
+    
+    this.currentBreakpoint = this.detectBreakpoint();
+    this.callbacks = new Set();
+    
+    this.init();
+  }
+  
+  init() {
+    window.addEventListener('resize', this.debounce(() => {
+      const newBreakpoint = this.detectBreakpoint();
+      if (newBreakpoint !== this.currentBreakpoint) {
+        this.currentBreakpoint = newBreakpoint;
+        this.notifyCallbacks();
+      }
+    }, 150));
+    
+    // Set CSS custom property for current breakpoint
+    this.updateCSSBreakpoint();
+  }
+  
+  detectBreakpoint() {
+    const width = window.innerWidth;
+    
+    if (width >= this.breakpoints.desktop.min) return 'desktop';
+    if (width >= this.breakpoints.tablet.min) return 'tablet';
+    return 'mobile';
+  }
+  
+  updateCSSBreakpoint() {
+    document.documentElement.style.setProperty('--current-breakpoint', this.currentBreakpoint);
+    document.documentElement.setAttribute('data-breakpoint', this.currentBreakpoint);
+  }
+  
+  subscribe(callback) {
+    this.callbacks.add(callback);
+    return () => this.callbacks.delete(callback);
+  }
+  
+  notifyCallbacks() {
+    this.updateCSSBreakpoint();
+    this.callbacks.forEach(callback => callback(this.currentBreakpoint));
+  }
+  
+  debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+      const later = () => {
+        clearTimeout(timeout);
+        func(...args);
+      };
+      clearTimeout(timeout);
+      timeout = setTimeout(later, wait);
+    };
+  }
+}
+
+// Initialize global responsive manager
+window.ResponsiveManager = new ResponsiveBreakpointManager();
+
+// ============================================================================
+// ENHANCED MENU DRAWER WITH PROPER RESPONSIVE BEHAVIOR  
+// ============================================================================
+
 class MenuDrawer extends HTMLElement {
   constructor() {
     super();
+    this.onKeyUp = this.onKeyUp.bind(this);
+    this.onSummaryClick = this.onSummaryClick.bind(this);
+    this.onFocusOut = this.onFocusOut.bind(this);
+    this.onCloseButtonClick = this.onCloseButtonClick.bind(this);
 
-    this.mainDetailsToggle = this.querySelector('details');
-
-    this.addEventListener('keyup', this.onKeyUp.bind(this));
-    this.addEventListener('focusout', this.onFocusOut.bind(this));
+    this.initResponsiveBehavior();
     this.bindEvents();
+  }
+  
+  initResponsiveBehavior() {
+    // Subscribe to breakpoint changes
+    this.breakpointUnsubscriber = window.ResponsiveManager.subscribe((breakpoint) => {
+      this.updateBreakpointBehavior(breakpoint);
+    });
+    
+    // Set initial breakpoint
+    this.updateBreakpointBehavior(window.ResponsiveManager.currentBreakpoint);
+  }
+  
+  updateBreakpointBehavior(breakpoint) {
+    // Always use current screen breakpoint, not theme settings
+    this.dataset.breakpoint = breakpoint;
+    
+    // Apply breakpoint-specific styles and behaviors
+    this.classList.remove('mobile-drawer', 'tablet-drawer', 'desktop-drawer');
+    this.classList.add(`${breakpoint}-drawer`);
+    
+    // Adjust behavior based on breakpoint
+    if (breakpoint === 'mobile') {
+      this.enableMobileOptimizations();
+    } else if (breakpoint === 'tablet') {
+      this.enableTabletOptimizations();
+    } else {
+      this.enableDesktopOptimizations();
+    }
+  }
+  
+  enableMobileOptimizations() {
+    // Mobile-specific optimizations
+    this.style.setProperty('--drawer-width', '100vw');
+    this.setAttribute('aria-label', 'Mobile navigation menu');
+  }
+  
+  enableTabletOptimizations() {
+    // Tablet-specific optimizations  
+    this.style.setProperty('--drawer-width', '400px');
+    this.setAttribute('aria-label', 'Tablet navigation menu');
+  }
+  
+  enableDesktopOptimizations() {
+    // Desktop-specific optimizations
+    this.style.setProperty('--drawer-width', '450px');
+    this.setAttribute('aria-label', 'Desktop navigation menu');
   }
 
   bindEvents() {
+    this.mainDetailsToggle = this.querySelector('details');
+    
+    this.addEventListener('keyup', this.onKeyUp);
+    this.addEventListener('focusout', this.onFocusOut);
+    
     this.querySelectorAll('summary').forEach((summary) =>
-      summary.addEventListener('click', this.onSummaryClick.bind(this))
+      summary.addEventListener('click', this.onSummaryClick)
     );
     this.querySelectorAll(
       'button:not(.localization-selector):not(.country-selector__close-button):not(.country-filter__reset-button)'
-    ).forEach((button) => button.addEventListener('click', this.onCloseButtonClick.bind(this)));
+    ).forEach((button) => button.addEventListener('click', this.onCloseButtonClick));
   }
 
   onKeyUp(event) {
@@ -465,7 +591,8 @@ class MenuDrawer extends HTMLElement {
       if (isOpen) event.preventDefault();
       isOpen ? this.closeMenuDrawer(event, summaryElement) : this.openMenuDrawer(summaryElement);
 
-      if (window.matchMedia('(max-width: 990px)')) {
+      // Use responsive manager for viewport height
+      if (window.ResponsiveManager.currentBreakpoint !== 'desktop') {
         document.documentElement.style.setProperty('--viewport-height', `${window.innerHeight}px`);
       }
     } else {
@@ -550,9 +677,19 @@ class MenuDrawer extends HTMLElement {
 
     window.requestAnimationFrame(handleAnimation);
   }
+  
+  disconnectedCallback() {
+    if (this.breakpointUnsubscriber) {
+      this.breakpointUnsubscriber();
+    }
+  }
 }
 
 customElements.define('menu-drawer', MenuDrawer);
+
+// ============================================================================
+// ENHANCED HEADER DRAWER WITH RESPONSIVE OPTIMIZATIONS
+// ============================================================================
 
 class HeaderDrawer extends MenuDrawer {
   constructor() {
@@ -597,6 +734,129 @@ class HeaderDrawer extends MenuDrawer {
 }
 
 customElements.define('header-drawer', HeaderDrawer);
+
+// ============================================================================
+// ENHANCED PRODUCT INFO WITH RESPONSIVE BEHAVIOR
+// ============================================================================
+
+class ProductInfo extends HTMLElement {
+  constructor() {
+    super();
+    this.initResponsiveBehavior();
+  }
+  
+  connectedCallback() {
+    this.setupLayoutOptimizations();
+    this.fixTextOrientation();
+  }
+  
+  initResponsiveBehavior() {
+    this.breakpointUnsubscriber = window.ResponsiveManager.subscribe((breakpoint) => {
+      this.updateLayoutForBreakpoint(breakpoint);
+    });
+    
+    // Set initial layout
+    this.updateLayoutForBreakpoint(window.ResponsiveManager.currentBreakpoint);
+  }
+  
+  updateLayoutForBreakpoint(breakpoint) {
+    this.classList.remove('mobile-layout', 'tablet-layout', 'desktop-layout');
+    this.classList.add(`${breakpoint}-layout`);
+    
+    if (breakpoint === 'mobile') {
+      this.enableMobileLayout();
+    } else if (breakpoint === 'tablet') {
+      this.enableTabletLayout();
+    } else {
+      this.enableDesktopLayout();
+    }
+  }
+  
+  enableMobileLayout() {
+    const mediaWrapper = this.querySelector('.product__media-wrapper');
+    const infoWrapper = this.querySelector('.product__info-wrapper');
+    
+    if (mediaWrapper && infoWrapper) {
+      mediaWrapper.style.width = '100%';
+      mediaWrapper.style.marginBottom = '1.5rem';
+      infoWrapper.style.width = '100%';
+      infoWrapper.style.padding = '0';
+    }
+  }
+  
+  enableTabletLayout() {
+    const mediaWrapper = this.querySelector('.product__media-wrapper');
+    const infoWrapper = this.querySelector('.product__info-wrapper');
+    
+    if (mediaWrapper && infoWrapper) {
+      mediaWrapper.style.width = '55%';
+      mediaWrapper.style.marginBottom = '0';
+      infoWrapper.style.width = '45%';
+      infoWrapper.style.padding = '0 0 0 2rem';
+    }
+  }
+  
+  enableDesktopLayout() {
+    const mediaWrapper = this.querySelector('.product__media-wrapper');
+    const infoWrapper = this.querySelector('.product__info-wrapper');
+    
+    if (mediaWrapper && infoWrapper) {
+      mediaWrapper.style.width = '60%';
+      mediaWrapper.style.marginBottom = '0';
+      infoWrapper.style.width = '40%';
+      infoWrapper.style.padding = '0 0 0 3rem';
+    }
+  }
+  
+  setupLayoutOptimizations() {
+    // Ensure proper flexbox layout
+    this.style.display = 'block';
+    this.style.width = '100%';
+    this.style.maxWidth = '100vw';
+    this.style.overflowX = 'hidden';
+    
+    const product = this.querySelector('.product');
+    if (product) {
+      product.style.display = 'flex';
+      product.style.flexWrap = 'wrap';
+      product.style.gap = '0';
+      product.style.width = '100%';
+    }
+  }
+  
+  fixTextOrientation() {
+    // Force horizontal text orientation for all text elements
+    const textElements = this.querySelectorAll(`
+      .product__title, .product__title *,
+      .product__info-wrapper, .product__info-wrapper *,
+      .price, .price *,
+      .product-form__buttons, .product-form__submit,
+      .btn, button,
+      .product__text, .product__description,
+      .product-form__input label, .product-form__input,
+      .rte, .rte *,
+      p, span, div, a
+    `);
+    
+    textElements.forEach(element => {
+      element.style.writingMode = 'horizontal-tb';
+      element.style.textOrientation = 'mixed';
+      element.style.direction = 'ltr';
+    });
+  }
+  
+  disconnectedCallback() {
+    if (this.breakpointUnsubscriber) {
+      this.breakpointUnsubscriber();
+    }
+  }
+}
+
+customElements.define('product-info', ProductInfo);
+
+// ============================================================================
+// EXISTING CODE PRESERVATION
+// ============================================================================
 
 class ModalDialog extends HTMLElement {
   constructor() {
