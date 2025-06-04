@@ -11,7 +11,11 @@
   <div class="main-media-container" data-media-index="0">
     {%- assign primary_media = product.selected_or_first_available_variant.featured_media | default: product.featured_media -%}
     
+<<<<<<< HEAD
       {%- for media in product.media -%}
+=======
+    {%- for media in product.media -%}
+>>>>>>> 3826508a52e0f0338250c93f86b00d4f80323a85
       <div 
         class="media-item{% if forloop.first %} active{% endif %}" 
         data-media-index="{{ forloop.index0 }}"
@@ -53,7 +57,11 @@
                       {%- assign minutes = duration_seconds | divided_by: 60 -%}
                       {%- assign seconds = duration_seconds | modulo: 60 -%}
                       {{ minutes }}:{{ seconds | prepend: '0' | slice: -2, 2 }}
+<<<<<<< HEAD
               {%- else -%}
+=======
+                    {%- else -%}
+>>>>>>> 3826508a52e0f0338250c93f86b00d4f80323a85
                       0:{{ duration_seconds | prepend: '0' | slice: -2, 2 }}
                     {%- endif -%}
                   </span>
@@ -61,7 +69,11 @@
                 
                 {%- if video_resolution -%}
                   <span class="resolution-badge">{{ video_resolution | replace: 'x', '×' }}</span>
+<<<<<<< HEAD
               {%- endif -%}
+=======
+                {%- endif -%}
+>>>>>>> 3826508a52e0f0338250c93f86b00d4f80323a85
               </div>
             </div>
             
@@ -79,9 +91,15 @@
               {{ media | media_tag: loading: 'lazy' }}
             </div>
         {%- endcase -%}
+<<<<<<< HEAD
         </div>
       {%- endfor -%}
     </div>
+=======
+      </div>
+    {%- endfor -%}
+  </div>
+>>>>>>> 3826508a52e0f0338250c93f86b00d4f80323a85
 
   <!-- Enhanced Thumbnails Row -->
   {%- if product.media.size > 1 -%}
@@ -143,11 +161,19 @@
           </button>
         {%- endfor -%}
       </div>
+<<<<<<< HEAD
       </div>
     {%- endif -%}
   </div>
 
   <style>
+=======
+    </div>
+  {%- endif -%}
+</div>
+
+<style>
+>>>>>>> 3826508a52e0f0338250c93f86b00d4f80323a85
 /* ENHANCED MEDIA GALLERY v0.7 - DIRECT VIDEO PLAYBACK */
 .direct-media-gallery {
   width: 100%;
@@ -167,6 +193,7 @@
 
 .media-item {
   position: relative;
+<<<<<<< HEAD
     width: 100%;
   height: 100%;
   }
@@ -187,6 +214,28 @@
   background: #000;
   display: block;
   }
+=======
+  width: 100%;
+  height: 100%;
+}
+
+/* Direct Video Styling */
+.video-container {
+  position: relative;
+  width: 100%;
+  background: #000;
+  border-radius: 12px 12px 0 0;
+  overflow: hidden;
+}
+
+.direct-video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #000;
+  display: block;
+}
+>>>>>>> 3826508a52e0f0338250c93f86b00d4f80323a85
 
 .direct-video:focus {
   outline: 2px solid #2563eb;
@@ -198,7 +247,11 @@
   position: absolute;
   top: 12px;
   left: 12px;
+<<<<<<< HEAD
     display: flex;
+=======
+  display: flex;
+>>>>>>> 3826508a52e0f0338250c93f86b00d4f80323a85
   gap: 8px;
   pointer-events: none;
 }
@@ -212,13 +265,18 @@
   font-weight: 600;
   backdrop-filter: blur(8px);
   border: 1px solid rgba(255, 255, 255, 0.1);
+<<<<<<< HEAD
   }
+=======
+}
+>>>>>>> 3826508a52e0f0338250c93f86b00d4f80323a85
 
 .resolution-badge {
   background: rgba(16, 185, 129, 0.9);
 }
 
 /* Image Styling */
+<<<<<<< HEAD
   .image-container {
     width: 100%;
     height: 100%;
@@ -229,6 +287,18 @@
   }
 
   .product-image {
+=======
+.image-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f8fafc;
+}
+
+.product-image {
+>>>>>>> 3826508a52e0f0338250c93f86b00d4f80323a85
   max-width: 100%;
   max-height: 100%;
   object-fit: contain;
@@ -240,12 +310,21 @@
   padding: 16px;
   background: #ffffff;
   border-top: 1px solid #e5e7eb;
+<<<<<<< HEAD
   }
 
   .thumbnails-row {
     display: flex;
   gap: 12px;
     overflow-x: auto;
+=======
+}
+
+.thumbnails-row {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+>>>>>>> 3826508a52e0f0338250c93f86b00d4f80323a85
   padding: 4px;
   scroll-behavior: smooth;
 }
@@ -266,6 +345,7 @@
 
 .thumbnails-row::-webkit-scrollbar-thumb:hover {
   background: #9ca3af;
+<<<<<<< HEAD
   }
 
 .thumbnail-item {
@@ -284,6 +364,26 @@
 
 .thumbnail-item:hover {
     border-color: #3b82f6;
+=======
+}
+
+.thumbnail-item {
+  position: relative;
+  flex-shrink: 0;
+  width: 80px;
+  height: 60px;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #f8fafc;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0;
+}
+
+.thumbnail-item:hover {
+  border-color: #3b82f6;
+>>>>>>> 3826508a52e0f0338250c93f86b00d4f80323a85
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
 }
@@ -297,6 +397,7 @@
   position: relative;
   width: 100%;
   height: 100%;
+<<<<<<< HEAD
   }
 
 .thumbnail-image {
@@ -307,16 +408,37 @@
 
 .media-type-indicator {
     position: absolute;
+=======
+}
+
+.thumbnail-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.media-type-indicator {
+  position: absolute;
+>>>>>>> 3826508a52e0f0338250c93f86b00d4f80323a85
   bottom: 4px;
   right: 4px;
   width: 20px;
   height: 20px;
+<<<<<<< HEAD
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
   font-size: 10px;
   }
+=======
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+}
+>>>>>>> 3826508a52e0f0338250c93f86b00d4f80323a85
 
 .video-indicator {
   background: rgba(239, 68, 68, 0.9);
@@ -349,7 +471,11 @@
   .main-media-container {
     min-height: 250px;
   }
+<<<<<<< HEAD
 
+=======
+  
+>>>>>>> 3826508a52e0f0338250c93f86b00d4f80323a85
   .thumbnails-container {
     padding: 12px;
   }
@@ -380,7 +506,11 @@
   .thumbnail-image {
     image-rendering: -webkit-optimize-contrast;
     image-rendering: crisp-edges;
+<<<<<<< HEAD
     }
+=======
+  }
+>>>>>>> 3826508a52e0f0338250c93f86b00d4f80323a85
 }
 
 /* Focus and accessibility */
@@ -392,7 +522,11 @@
 /* Loading state */
 .media-item.loading .direct-video {
   opacity: 0.7;
+<<<<<<< HEAD
     }
+=======
+}
+>>>>>>> 3826508a52e0f0338250c93f86b00d4f80323a85
 
 .media-item.loading::after {
   content: '';
@@ -411,6 +545,7 @@
 @keyframes spin {
   0% { transform: translate(-50%, -50%) rotate(0deg); }
   100% { transform: translate(-50%, -50%) rotate(360deg); }
+<<<<<<< HEAD
   }
   </style>
 
@@ -420,6 +555,17 @@
   const gallery = document.querySelector('.direct-media-gallery');
     if (!gallery) return;
     
+=======
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Enhanced media gallery functionality v0.7
+  const gallery = document.querySelector('.direct-media-gallery');
+  if (!gallery) return;
+  
+>>>>>>> 3826508a52e0f0338250c93f86b00d4f80323a85
   const mainContainer = gallery.querySelector('.main-media-container');
   const thumbnails = gallery.querySelectorAll('.thumbnail-item');
   let currentMediaIndex = 0;
@@ -527,5 +673,10 @@
       // Don't auto-play, let user control
     }
   }, 1000);
+<<<<<<< HEAD
   });
   </script>
+=======
+});
+</script> 
+>>>>>>> 3826508a52e0f0338250c93f86b00d4f80323a85
