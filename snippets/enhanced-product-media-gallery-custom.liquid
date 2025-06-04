@@ -1,0 +1,1132 @@
+{%- comment -%}
+  Enhanced Product Media Gallery v1.0 - CUSTOM VARIABLES
+  - Full integration with theme settings
+  - User-configurable auto-swap behavior
+  - Custom preview rules and layout options
+  - Advanced video controls and analytics
+{%- endcomment -%}
+
+{%- liquid
+  # Load custom variables from theme settings
+  assign enable_auto_swap = settings.enable_auto_swap | default: true
+  assign swap_trigger = settings.swap_trigger | default: 'onload'
+  assign swap_animation_speed = settings.swap_animation_speed | default: 'fast'
+  assign show_swap_indicators = settings.show_swap_indicators | default: true
+  assign preserve_original_order = settings.preserve_original_order | default: true
+  
+  assign video_autoplay_hover = settings.video_autoplay_hover | default: false
+  assign video_loop = settings.video_loop | default: true
+  assign video_controls = settings.video_controls | default: 'hover'
+  assign preview_thumbnail_count = settings.preview_thumbnail_count | default: 4
+  
+  assign gallery_layout_style = settings.gallery_layout_style | default: 'modern'
+  assign gallery_aspect_ratio = settings.gallery_aspect_ratio | default: '16-9'
+  assign gallery_border_radius = settings.gallery_border_radius | default: 12
+  
+  assign enable_video_analytics = settings.enable_video_analytics | default: false
+  assign preload_videos = settings.preload_videos | default: false
+  assign fallback_image_priority = settings.fallback_image_priority | default: 'first'
+  assign debug_mode = settings.debug_mode | default: false
+  assign performance_monitoring = settings.performance_monitoring | default: false
+-%}
+
+<div class="custom-media-gallery {{ gallery_layout_style }}-layout" 
+     data-product-id="{{ product.id }}"
+     data-enable-auto-swap="{{ enable_auto_swap }}"
+     data-swap-trigger="{{ swap_trigger }}"
+     data-swap-speed="{{ swap_animation_speed }}"
+     data-show-indicators="{{ show_swap_indicators }}"
+     data-preserve-order="{{ preserve_original_order }}"
+     data-video-autoplay="{{ video_autoplay_hover }}"
+     data-video-loop="{{ video_loop }}"
+     data-video-controls="{{ video_controls }}"
+     data-aspect-ratio="{{ gallery_aspect_ratio }}"
+     data-debug="{{ debug_mode }}"
+     data-analytics="{{ enable_video_analytics }}"
+     data-performance="{{ performance_monitoring }}">
+
+  <!-- Main Media Display Container -->
+  <div class="main-media-container" 
+       style="border-radius: {{ gallery_border_radius }}px;"
+       data-original-order="true">
+    
+    {%- liquid
+      # Determine primary media based on variant or product
+      assign primary_media = product.selected_or_first_available_variant.featured_media | default: product.featured_media
+      
+      # Get fallback image based on priority setting
+      case fallback_image_priority
+        when 'first'
+          assign fallback_image = product.media.first
+        when 'featured'  
+          assign fallback_image = product.featured_media
+        when 'last'
+          assign fallback_image = product.media.last
+        else
+          assign fallback_image = product.media.first
+      endcase
+    -%}
+    
+    {%- for media in product.media limit: preview_thumbnail_count -%}
+      <div class="media-item{% if forloop.first %} active{% endif %}" 
+           data-media-index="{{ forloop.index0 }}"
+           data-original-index="{{ forloop.index0 }}"
+           data-variant-id="{{ media.variant_ids | join: ',' }}"
+           data-media-type="{{ media.media_type }}"
+           data-media-id="{{ media.id }}"
+           {% if media.media_type == 'video' %}
+             data-video-duration="{{ media.duration | default: 0 }}"
+             data-video-sources="{{ media.sources | map: 'url' | join: ',' }}"
+           {% endif %}>
+
+        <!-- Swap Position Indicator -->
+        {% if show_swap_indicators and enable_auto_swap %}
+          <div class="swap-indicator" style="display: none;">
+            <span class="moving-up">↑ Moving to Top</span>
+            <span class="moving-down">↓ Moving Down</span>
+          </div>
+        {% endif %}
+
+        {% case media.media_type %}
+          {% when 'video' %}
+            <div class="video-container" data-aspect-ratio="{{ gallery_aspect_ratio }}">
+              <video 
+                class="product-video"
+                {% if video_loop %}loop{% endif %}
+                muted
+                playsinline
+                {% if preload_videos %}preload="metadata"{% else %}preload="none"{% endif %}
+                {% if video_controls == 'always' %}controls{% elsif video_controls == 'hover' %}data-controls-on-hover{% endif %}
+                data-auto-swap="{{ enable_auto_swap }}"
+                data-swap-trigger="{{ swap_trigger }}"
+                {% if video_autoplay_hover %}data-autoplay-hover="true"{% endif %}
+                poster="{{ fallback_image | image_url: width: 1200 }}"
+                aria-label="Product video: {{ product.title | escape }}">
+                
+                {%- for source in media.sources -%}
+                  <source src="{{ source.url }}" type="{{ source.mime_type }}">
+                {%- endfor -%}
+                
+                <!-- Fallback for unsupported video -->
+                <img src="{{ fallback_image | image_url: width: 1200 }}" 
+                     alt="{{ product.title | escape }}" 
+                     loading="lazy">
+              </video>
+
+              <!-- Video Overlay Controls -->
+              <div class="video-overlay" {% if video_controls == 'never' %}style="display: none;"{% endif %}>
+                <button class="play-pause-btn" type="button" aria-label="Play/Pause video">
+                  <svg class="play-icon" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M8 5v14l11-7z"/>
+                  </svg>
+                  <svg class="pause-icon" viewBox="0 0 24 24" fill="currentColor" style="display: none;">
+                    <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+                  </svg>
+                </button>
+
+                <!-- Video Progress Bar -->
+                <div class="video-progress">
+                  <div class="progress-bar">
+                    <div class="progress-fill"></div>
+                  </div>
+                  <span class="video-time">0:00</span>
+                </div>
+
+                <!-- Video Metadata Overlay -->
+                <div class="video-metadata">
+                  {% if product.metafields.custom.video_duration_.value %}
+                    <span class="duration-badge">{{ product.metafields.custom.video_duration_.value }}s</span>
+                  {% endif %}
+                  {% if product.metafields.custom.video_resolutions.value %}
+                    <span class="resolution-badge">{{ product.metafields.custom.video_resolutions.value | first }}</span>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+
+          {% when 'image' %}
+            <div class="image-container" data-aspect-ratio="{{ gallery_aspect_ratio }}">
+              <img 
+                src="{{ media | image_url: width: 1200 }}"
+                alt="{{ media.alt | default: product.title | escape }}"
+                loading="{% if forloop.first %}eager{% else %}lazy{% endif %}"
+                class="product-image"
+                data-media-id="{{ media.id }}"
+                width="1200"
+                height="800">
+            </div>
+
+          {% when 'external_video' %}
+            <div class="external-video-container" data-aspect-ratio="{{ gallery_aspect_ratio }}">
+              {{ media | external_video_tag: class: 'external-video', loading: 'lazy' }}
+              
+              <!-- External Video Metadata -->
+              <div class="video-metadata">
+                <span class="external-badge">{{ media.host | capitalize }}</span>
+                {% if product.metafields.custom.video_duration_.value %}
+                  <span class="duration-badge">{{ product.metafields.custom.video_duration_.value }}s</span>
+                {% endif %}
+              </div>
+            </div>
+
+          {% else %}
+            <!-- Fallback for other media types -->
+            <div class="media-fallback">
+              <img src="{{ fallback_image | image_url: width: 1200 }}" 
+                   alt="{{ product.title | escape }}" 
+                   loading="lazy">
+            </div>
+        {% endcase %}
+
+        <!-- Media Loading State -->
+        <div class="media-loading" style="display: none;">
+          <div class="loading-spinner"></div>
+          <span>Loading...</span>
+        </div>
+
+        <!-- Media Error State -->
+        <div class="media-error" style="display: none;">
+          <div class="error-icon">⚠️</div>
+          <span>Media failed to load</span>
+          <button class="retry-btn" type="button">Retry</button>
+        </div>
+      </div>
+    {%- endfor -%}
+  </div>
+
+  <!-- Thumbnail Navigation -->
+  <div class="thumbnail-navigation" 
+       data-max-thumbnails="{{ preview_thumbnail_count }}">
+    {%- for media in product.media limit: preview_thumbnail_count -%}
+      <button class="thumbnail-btn{% if forloop.first %} active{% endif %}"
+              type="button"
+              data-media-index="{{ forloop.index0 }}"
+              data-media-type="{{ media.media_type }}"
+              aria-label="View {% if media.media_type == 'video' %}video{% else %}image{% endif %} {{ forloop.index }}">
+        
+        {% case media.media_type %}
+          {% when 'video' %}
+            <div class="thumbnail-video">
+              <img src="{{ media.preview_image | image_url: width: 200 }}" 
+                   alt="Video thumbnail" 
+                   loading="lazy">
+              <div class="video-play-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M8 5v14l11-7z"/>
+                </svg>
+              </div>
+              {% if product.metafields.custom.video_duration_.value %}
+                <span class="thumbnail-duration">{{ product.metafields.custom.video_duration_.value }}s</span>
+              {% endif %}
+            </div>
+          {% when 'image' %}
+            <img src="{{ media | image_url: width: 200 }}" 
+                 alt="{{ media.alt | default: 'Product image' | escape }}" 
+                 loading="lazy">
+          {% when 'external_video' %}
+            <div class="thumbnail-external-video">
+              <img src="{{ media.preview_image | image_url: width: 200 }}" 
+                   alt="External video thumbnail" 
+                   loading="lazy">
+              <div class="external-video-icon">
+                <span>{{ media.host | slice: 0, 1 | upcase }}</span>
+              </div>
+            </div>
+          {% else %}
+            <img src="{{ fallback_image | image_url: width: 200 }}" 
+                 alt="Media thumbnail" 
+                 loading="lazy">
+        {% endcase %}
+      </button>
+    {%- endfor -%}
+  </div>
+
+  <!-- Gallery Controls -->
+  <div class="gallery-controls">
+    <button class="gallery-control prev-btn" type="button" aria-label="Previous media">
+      <svg viewBox="0 0 24 24" fill="currentColor">
+        <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+      </svg>
+    </button>
+    
+    <button class="gallery-control next-btn" type="button" aria-label="Next media">
+      <svg viewBox="0 0 24 24" fill="currentColor">
+        <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
+      </svg>
+    </button>
+
+    {% if enable_auto_swap %}
+      <button class="gallery-control auto-swap-toggle" 
+              type="button" 
+              aria-label="Toggle auto-swap"
+              data-enabled="{{ enable_auto_swap }}">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/>
+        </svg>
+      </button>
+    {% endif %}
+
+    <button class="gallery-control fullscreen-btn" type="button" aria-label="Fullscreen">
+      <svg viewBox="0 0 24 24" fill="currentColor">
+        <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>
+      </svg>
+    </button>
+  </div>
+</div>
+
+<!-- Enhanced Styles for Custom Gallery -->
+<style>
+  :root {
+    --gallery-border-radius: {{ gallery_border_radius }}px;
+    --swap-animation-duration: {% case swap_animation_speed %}{% when 'fast' %}0.3s{% when 'medium' %}0.5s{% when 'slow' %}0.8s{% when 'instant' %}0s{% else %}0.3s{% endcase %};
+  }
+
+  .custom-media-gallery {
+    position: relative;
+    width: 100%;
+    {% case gallery_layout_style %}
+      {% when 'modern' %}
+        display: grid;
+        gap: 1rem;
+        grid-template-areas: 
+          "main main"
+          "thumbs controls";
+        grid-template-columns: 1fr auto;
+      {% when 'classic' %}
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      {% when 'video-focus' %}
+        display: grid;
+        gap: 0.5rem;
+        grid-template-rows: 1fr auto auto;
+      {% when 'mobile-first' %}
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+      {% else %}
+        display: grid;
+        gap: 1rem;
+    {% endcase %}
+  }
+
+  .main-media-container {
+    {% case gallery_layout_style %}
+      {% when 'modern' %}grid-area: main;{% endcase %}
+    position: relative;
+    background: #f8f9fa;
+    border-radius: var(--gallery-border-radius);
+    overflow: hidden;
+    {% case gallery_aspect_ratio %}
+      {% when '16-9' %}aspect-ratio: 16/9;
+      {% when '4-3' %}aspect-ratio: 4/3;
+      {% when '1-1' %}aspect-ratio: 1/1;
+      {% when 'auto' %}height: auto;
+      {% else %}aspect-ratio: 16/9;
+    {% endcase %}
+  }
+
+  .media-item {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity var(--swap-animation-duration) ease-in-out,
+                transform var(--swap-animation-duration) ease-in-out;
+    transform: translateX(20px);
+  }
+
+  .media-item.active {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  .media-item.swapping {
+    animation: swapAnimation var(--swap-animation-duration) ease-in-out;
+  }
+
+  @keyframes swapAnimation {
+    0% { transform: translateY(0); opacity: 1; }
+    50% { transform: translateY(-20px); opacity: 0.5; }
+    100% { transform: translateY(0); opacity: 1; }
+  }
+
+  .video-container,
+  .image-container,
+  .external-video-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .product-video,
+  .product-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: var(--gallery-border-radius);
+  }
+
+  {% if video_controls == 'hover' %}
+    .video-overlay {
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    
+    .video-container:hover .video-overlay {
+      opacity: 1;
+    }
+  {% endif %}
+
+  .video-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background: linear-gradient(
+      to bottom,
+      rgba(0,0,0,0.3) 0%,
+      transparent 20%,
+      transparent 80%,
+      rgba(0,0,0,0.5) 100%
+    );
+    border-radius: var(--gallery-border-radius);
+  }
+
+  .play-pause-btn {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+  }
+
+  .play-pause-btn:hover {
+    background: rgba(255, 255, 255, 1);
+    transform: translate(-50%, -50%) scale(1.1);
+  }
+
+  .play-pause-btn svg {
+    width: 24px;
+    height: 24px;
+    color: #333;
+  }
+
+  .video-progress {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    right: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .progress-bar {
+    flex: 1;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: #3b82f6;
+    width: 0%;
+    transition: width 0.1s ease;
+  }
+
+  .video-time {
+    color: white;
+    font-size: 12px;
+    font-weight: 500;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+  }
+
+  .video-metadata {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    display: flex;
+    gap: 8px;
+    flex-direction: column;
+    align-items: flex-end;
+  }
+
+  .duration-badge,
+  .resolution-badge,
+  .external-badge {
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    backdrop-filter: blur(10px);
+  }
+
+  .resolution-badge {
+    background: rgba(59, 130, 246, 0.9);
+  }
+
+  .external-badge {
+    background: rgba(239, 68, 68, 0.9);
+  }
+
+  {% if show_swap_indicators %}
+    .swap-indicator {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-weight: 600;
+      z-index: 100;
+      animation: swapIndicatorPulse 1s ease-in-out;
+      backdrop-filter: blur(10px);
+    }
+
+    @keyframes swapIndicatorPulse {
+      0%, 100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+      50% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    }
+
+    .moving-up::before {
+      content: "↑ ";
+      color: #10b981;
+    }
+
+    .moving-down::before {
+      content: "↓ ";
+      color: #f59e0b;
+    }
+  {% endif %}
+
+  .thumbnail-navigation {
+    {% case gallery_layout_style %}
+      {% when 'modern' %}grid-area: thumbs;{% endcase %}
+    display: flex;
+    gap: 8px;
+    {% case gallery_layout_style %}
+      {% when 'classic', 'mobile-first' %}
+        justify-content: center;
+        flex-wrap: wrap;
+      {% when 'video-focus' %}
+        justify-content: flex-start;
+        overflow-x: auto;
+        scrollbar-width: thin;
+      {% else %}
+        justify-content: flex-start;
+    {% endcase %}
+  }
+
+  .thumbnail-btn {
+    position: relative;
+    width: 80px;
+    height: 60px;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: none;
+    padding: 0;
+  }
+
+  .thumbnail-btn:hover {
+    border-color: #3b82f6;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+  }
+
+  .thumbnail-btn.active {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+  }
+
+  .thumbnail-btn img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .video-play-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .video-play-icon svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  .thumbnail-duration {
+    position: absolute;
+    bottom: 4px;
+    right: 4px;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-size: 10px;
+    font-weight: 600;
+  }
+
+  .external-video-icon {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    background: #ef4444;
+    color: white;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: bold;
+  }
+
+  .gallery-controls {
+    {% case gallery_layout_style %}
+      {% when 'modern' %}grid-area: controls;{% endcase %}
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    {% case gallery_layout_style %}
+      {% when 'classic', 'mobile-first' %}
+        justify-content: center;
+      {% when 'video-focus' %}
+        justify-content: flex-end;
+      {% else %}
+        justify-content: flex-end;
+    {% endcase %}
+  }
+
+  .gallery-control {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: #6c757d;
+  }
+
+  .gallery-control:hover {
+    background: #3b82f6;
+    color: white;
+    border-color: #3b82f6;
+    transform: translateY(-1px);
+  }
+
+  .gallery-control svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .auto-swap-toggle[data-enabled="true"] {
+    background: #10b981;
+    color: white;
+    border-color: #10b981;
+  }
+
+  /* Media Loading & Error States */
+  .media-loading,
+  .media-error {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    color: #6c757d;
+    text-align: center;
+  }
+
+  .loading-spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid #f3f4f6;
+    border-top: 3px solid #3b82f6;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  .error-icon {
+    font-size: 32px;
+  }
+
+  .retry-btn {
+    background: #3b82f6;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.3s ease;
+  }
+
+  .retry-btn:hover {
+    background: #2563eb;
+  }
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .custom-media-gallery {
+      {% unless gallery_layout_style == 'mobile-first' %}
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      {% endunless %}
+    }
+
+    .thumbnail-navigation {
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .thumbnail-btn {
+      width: 60px;
+      height: 45px;
+    }
+
+    .gallery-controls {
+      justify-content: center;
+    }
+
+    .video-metadata {
+      top: 10px;
+      right: 10px;
+    }
+
+    .video-progress {
+      bottom: 15px;
+      left: 15px;
+      right: 15px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .thumbnail-btn {
+      width: 50px;
+      height: 38px;
+    }
+
+    .gallery-control {
+      width: 36px;
+      height: 36px;
+    }
+
+    .play-pause-btn {
+      width: 50px;
+      height: 50px;
+    }
+  }
+</style>
+
+<!-- Enhanced JavaScript for Custom Gallery -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const gallery = document.querySelector('.custom-media-gallery');
+  if (!gallery) return;
+
+  // Get settings from data attributes
+  const settings = {
+    enableAutoSwap: gallery.dataset.enableAutoSwap === 'true',
+    swapTrigger: gallery.dataset.swapTrigger || 'onload',
+    swapSpeed: gallery.dataset.swapSpeed || 'fast',
+    showIndicators: gallery.dataset.showIndicators === 'true',
+    preserveOrder: gallery.dataset.preserveOrder === 'true',
+    videoAutoplay: gallery.dataset.videoAutoplay === 'true',
+    videoLoop: gallery.dataset.videoLoop === 'true',
+    videoControls: gallery.dataset.videoControls || 'hover',
+    aspectRatio: gallery.dataset.aspectRatio || '16-9',
+    debug: gallery.dataset.debug === 'true',
+    analytics: gallery.dataset.analytics === 'true',
+    performance: gallery.dataset.performance === 'true'
+  };
+
+  if (settings.debug) {
+    console.log('🎬 GenStock Custom Gallery initialized with settings:', settings);
+  }
+
+  // Performance monitoring
+  let performanceMetrics = {};
+  if (settings.performance) {
+    performanceMetrics.initTime = performance.now();
+  }
+
+  // Initialize gallery functionality
+  initCustomGallery(gallery, settings, performanceMetrics);
+});
+
+function initCustomGallery(gallery, settings, metrics) {
+  const mediaItems = gallery.querySelectorAll('.media-item');
+  const thumbnails = gallery.querySelectorAll('.thumbnail-btn');
+  const controls = gallery.querySelectorAll('.gallery-control');
+  
+  let currentIndex = 0;
+  let swapState = sessionStorage.getItem('gallery-swap-state') ? 
+    JSON.parse(sessionStorage.getItem('gallery-swap-state')) : {};
+
+  // Auto-swap functionality
+  if (settings.enableAutoSwap) {
+    initAutoSwap(mediaItems, settings, swapState);
+  }
+
+  // Video controls
+  initVideoControls(mediaItems, settings);
+
+  // Thumbnail navigation
+  initThumbnailNavigation(thumbnails, mediaItems, settings);
+
+  // Gallery controls
+  initGalleryControls(controls, mediaItems, settings);
+
+  // Analytics tracking
+  if (settings.analytics) {
+    initAnalytics(gallery, settings);
+  }
+
+  // Performance metrics
+  if (settings.performance) {
+    metrics.readyTime = performance.now();
+    console.log('📊 Gallery performance:', {
+      initTime: (metrics.readyTime - metrics.initTime).toFixed(2) + 'ms'
+    });
+  }
+
+  if (settings.debug) {
+    console.log('✅ Custom gallery fully initialized');
+  }
+}
+
+function initAutoSwap(mediaItems, settings, swapState) {
+  mediaItems.forEach((item, index) => {
+    const video = item.querySelector('video');
+    if (!video) return;
+
+    // Add event listeners based on swap trigger
+    switch (settings.swapTrigger) {
+      case 'onload':
+        video.addEventListener('loadstart', () => triggerSwap(item, index, settings));
+        video.addEventListener('canplay', () => triggerSwap(item, index, settings));
+        break;
+      case 'onplay':
+        video.addEventListener('play', () => triggerSwap(item, index, settings));
+        break;
+      case 'onhover':
+        item.addEventListener('mouseenter', () => triggerSwap(item, index, settings));
+        break;
+      case 'onclick':
+        item.addEventListener('click', () => triggerSwap(item, index, settings));
+        break;
+    }
+  });
+}
+
+function triggerSwap(item, index, settings) {
+  if (index === 0) return; // Already in first position
+
+  const gallery = item.closest('.custom-media-gallery');
+  const firstItem = gallery.querySelector('.media-item[data-original-index="0"]');
+  
+  if (settings.showIndicators) {
+    showSwapIndicator(item, 'moving-up');
+    showSwapIndicator(firstItem, 'moving-down');
+  }
+
+  // Animate the swap
+  setTimeout(() => {
+    // Swap DOM positions
+    const parent = item.parentNode;
+    const firstItemNext = firstItem.nextSibling;
+    
+    if (firstItemNext === item) {
+      parent.insertBefore(item, firstItem);
+    } else {
+      parent.insertBefore(item, firstItem);
+      parent.insertBefore(firstItem, firstItemNext);
+    }
+
+    // Update active states
+    gallery.querySelectorAll('.media-item').forEach(mi => mi.classList.remove('active'));
+    item.classList.add('active');
+    
+    // Update thumbnail states
+    const thumbnails = gallery.querySelectorAll('.thumbnail-btn');
+    thumbnails.forEach(thumb => thumb.classList.remove('active'));
+    thumbnails[index].classList.add('active');
+
+    if (settings.debug) {
+      console.log(`🔄 Auto-swapped: item ${index} moved to position 0`);
+    }
+  }, getSwapDelay(settings.swapSpeed));
+
+  // Save swap state
+  if (settings.preserveOrder) {
+    const productId = gallery.dataset.productId;
+    let swapState = JSON.parse(sessionStorage.getItem('gallery-swap-state') || '{}');
+    swapState[productId] = { firstIndex: index, swappedAt: Date.now() };
+    sessionStorage.setItem('gallery-swap-state', JSON.stringify(swapState));
+  }
+}
+
+function showSwapIndicator(item, className) {
+  const indicator = item.querySelector('.swap-indicator');
+  if (!indicator) return;
+
+  const text = indicator.querySelector(`.${className}`);
+  if (text) {
+    indicator.style.display = 'block';
+    text.style.display = 'block';
+    
+    setTimeout(() => {
+      indicator.style.display = 'none';
+      text.style.display = 'none';
+    }, 1500);
+  }
+}
+
+function getSwapDelay(speed) {
+  switch (speed) {
+    case 'fast': return 300;
+    case 'medium': return 500;
+    case 'slow': return 800;
+    case 'instant': return 0;
+    default: return 300;
+  }
+}
+
+function initVideoControls(mediaItems, settings) {
+  mediaItems.forEach(item => {
+    const video = item.querySelector('video');
+    if (!video) return;
+
+    const playBtn = item.querySelector('.play-pause-btn');
+    const progressBar = item.querySelector('.progress-fill');
+    const timeDisplay = item.querySelector('.video-time');
+
+    // Auto-play on hover
+    if (settings.videoAutoplay) {
+      item.addEventListener('mouseenter', () => {
+        video.play().catch(() => {
+          if (settings.debug) console.log('Autoplay blocked by browser');
+        });
+      });
+      
+      item.addEventListener('mouseleave', () => {
+        video.pause();
+      });
+    }
+
+    // Play/pause button
+    if (playBtn) {
+      playBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (video.paused) {
+          video.play();
+        } else {
+          video.pause();
+        }
+      });
+    }
+
+    // Video events
+    video.addEventListener('play', () => updatePlayButton(playBtn, false));
+    video.addEventListener('pause', () => updatePlayButton(playBtn, true));
+    video.addEventListener('timeupdate', () => {
+      updateProgress(video, progressBar, timeDisplay);
+    });
+
+    // Loop setting
+    video.loop = settings.videoLoop;
+  });
+}
+
+function updatePlayButton(button, showPlay) {
+  if (!button) return;
+  
+  const playIcon = button.querySelector('.play-icon');
+  const pauseIcon = button.querySelector('.pause-icon');
+  
+  if (showPlay) {
+    playIcon.style.display = 'block';
+    pauseIcon.style.display = 'none';
+  } else {
+    playIcon.style.display = 'none';
+    pauseIcon.style.display = 'block';
+  }
+}
+
+function updateProgress(video, progressBar, timeDisplay) {
+  if (!progressBar || !timeDisplay) return;
+  
+  const progress = (video.currentTime / video.duration) * 100;
+  progressBar.style.width = progress + '%';
+  
+  const minutes = Math.floor(video.currentTime / 60);
+  const seconds = Math.floor(video.currentTime % 60);
+  timeDisplay.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+}
+
+function initThumbnailNavigation(thumbnails, mediaItems, settings) {
+  thumbnails.forEach((thumb, index) => {
+    thumb.addEventListener('click', () => {
+      // Update active states
+      thumbnails.forEach(t => t.classList.remove('active'));
+      thumb.classList.add('active');
+      
+      mediaItems.forEach(item => item.classList.remove('active'));
+      mediaItems[index].classList.add('active');
+
+      if (settings.debug) {
+        console.log(`📍 Switched to media item ${index}`);
+      }
+    });
+  });
+}
+
+function initGalleryControls(controls, mediaItems, settings) {
+  const prevBtn = document.querySelector('.prev-btn');
+  const nextBtn = document.querySelector('.next-btn');
+  const autoSwapToggle = document.querySelector('.auto-swap-toggle');
+  const fullscreenBtn = document.querySelector('.fullscreen-btn');
+
+  if (prevBtn && nextBtn) {
+    let currentIndex = 0;
+    
+    prevBtn.addEventListener('click', () => {
+      currentIndex = currentIndex > 0 ? currentIndex - 1 : mediaItems.length - 1;
+      switchToMedia(currentIndex, mediaItems);
+    });
+    
+    nextBtn.addEventListener('click', () => {
+      currentIndex = currentIndex < mediaItems.length - 1 ? currentIndex + 1 : 0;
+      switchToMedia(currentIndex, mediaItems);
+    });
+  }
+
+  if (autoSwapToggle) {
+    autoSwapToggle.addEventListener('click', () => {
+      const isEnabled = autoSwapToggle.dataset.enabled === 'true';
+      autoSwapToggle.dataset.enabled = (!isEnabled).toString();
+      autoSwapToggle.style.background = !isEnabled ? '#10b981' : '#f8f9fa';
+      autoSwapToggle.style.color = !isEnabled ? 'white' : '#6c757d';
+      
+      if (settings.debug) {
+        console.log(`🔄 Auto-swap ${!isEnabled ? 'enabled' : 'disabled'}`);
+      }
+    });
+  }
+
+  if (fullscreenBtn) {
+    fullscreenBtn.addEventListener('click', () => {
+      const gallery = document.querySelector('.custom-media-gallery');
+      if (gallery.requestFullscreen) {
+        gallery.requestFullscreen();
+      }
+    });
+  }
+}
+
+function switchToMedia(index, mediaItems) {
+  mediaItems.forEach((item, i) => {
+    item.classList.toggle('active', i === index);
+  });
+
+  const thumbnails = document.querySelectorAll('.thumbnail-btn');
+  thumbnails.forEach((thumb, i) => {
+    thumb.classList.toggle('active', i === index);
+  });
+}
+
+function initAnalytics(gallery, settings) {
+  // Track video interactions
+  const videos = gallery.querySelectorAll('video');
+  videos.forEach((video, index) => {
+    video.addEventListener('play', () => {
+      trackEvent('video_play', { videoIndex: index });
+    });
+    
+    video.addEventListener('pause', () => {
+      trackEvent('video_pause', { videoIndex: index });
+    });
+    
+    video.addEventListener('ended', () => {
+      trackEvent('video_complete', { videoIndex: index });
+    });
+  });
+
+  // Track thumbnail clicks
+  const thumbnails = gallery.querySelectorAll('.thumbnail-btn');
+  thumbnails.forEach((thumb, index) => {
+    thumb.addEventListener('click', () => {
+      trackEvent('thumbnail_click', { thumbnailIndex: index });
+    });
+  });
+}
+
+function trackEvent(eventName, data) {
+  if (window.gtag) {
+    window.gtag('event', eventName, data);
+  } else if (window.dataLayer) {
+    window.dataLayer.push({
+      event: eventName,
+      ...data
+    });
+  }
+  
+  console.log('📊 Analytics event:', eventName, data);
+}
+</script> 

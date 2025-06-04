@@ -66,19 +66,19 @@
             endif
           -%}
           <div
-            class="footer__blocks-wrapper grid grid--1-col grid--2-col grid--4-col-tablet {{ footer_grid_class }}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}"
-            {% if settings.animations_reveal_on_scroll %}
+            class="footer__blocks-wrapper grid grid--1-col grid--2-col grid--4-col-tablet {{ footer_grid_class }}{%- if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{%- endif -%}"
+            {%- if settings.animations_reveal_on_scroll %}
               data-cascade
-            {% endif %}
+            {%- endif -%}
           >
             {%- for block in section.blocks -%}
               <div
-                class="footer-block grid__item{% if block.type == 'link_list' %} footer-block--menu{% endif %}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}"
+                class="footer-block grid__item{%- if block.type == 'link_list' %} footer-block--menu{%- endif -%}{%- if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{%- endif -%}"
                 {{ block.shopify_attributes }}
-                {% if settings.animations_reveal_on_scroll %}
+                {%- if settings.animations_reveal_on_scroll %}
                   data-cascade
                   style="--animation-order: {{ forloop.index }};"
-                {% endif %}
+                {%- endif -%}
               >
                 {%- if block.settings.heading != blank -%}
                   <h2 class="footer-block__heading inline-richtext">{{- block.settings.heading -}}</h2>
@@ -98,7 +98,7 @@
                           <li>
                             <a
                               href="{{ link.url }}"
-                              class="link link--text list-menu__item list-menu__item--link{% if link.active %} list-menu__item--active{% endif %}"
+                              class="link link--text list-menu__item list-menu__item--link{%- if link.active %} list-menu__item--active{%- endif -%}"
                             >
                               {{ link.title | escape }}
                             </a>
@@ -165,10 +165,10 @@
         {%- endif -%}
 
         <div
-          class="footer-block--newsletter{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}"
-          {% if settings.animations_reveal_on_scroll %}
+          class="footer-block--newsletter{%- if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{%- endif -%}"
+          {%- if settings.animations_reveal_on_scroll %}
             data-cascade
-          {% endif %}
+          {%- endif -%}
         >
           {%- if section.settings.newsletter_enable -%}
             <div class="footer-block__newsletter">
@@ -189,13 +189,13 @@
                       autocorrect="off"
                       autocapitalize="off"
                       autocomplete="email"
-                      {% if form.errors %}
+                      {%- if form.errors %}
                         autofocus
                         aria-invalid="true"
                         aria-describedby="ContactFooter-error"
                       {% elsif form.posted_successfully? %}
                         aria-describedby="ContactFooter-success"
-                      {% endif %}
+                      {%- endif -%}
                       placeholder="{{ 'newsletter.label' | t }}"
                       required
                     >
@@ -250,10 +250,10 @@
   {%- endif -%}
 
   <div
-    class="footer__content-bottom{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}"
-    {% if settings.animations_reveal_on_scroll %}
+    class="footer__content-bottom{%- if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{%- endif -%}"
+    {%- if settings.animations_reveal_on_scroll %}
       data-cascade
-    {% endif %}
+    {%- endif -%}
   >
     <div class="footer__content-bottom-wrapper page-width">
       <div class="footer__column footer__localization isolate">
@@ -312,7 +312,7 @@
         {%- endif -%}
       </div>
     </div>
-    <div class="footer__content-bottom-wrapper page-width{% if section.settings.enable_country_selector == false and section.settings.enable_language_selector == false %} footer__content-bottom-wrapper--center{% endif %}">
+    <div class="footer__content-bottom-wrapper page-width{%- if section.settings.enable_country_selector == false and section.settings.enable_language_selector == false %} footer__content-bottom-wrapper--center{%- endif -%}">
       <div class="footer__copyright caption">
         <small class="copyright__content">&copy; {{ 'now' | date: '%Y' }}, {{ shop.name | link_to: routes.root_url -}}</small>
         <small class="copyright__content">Affordable Stock Videos - PayPal & Crypto Payments</small>

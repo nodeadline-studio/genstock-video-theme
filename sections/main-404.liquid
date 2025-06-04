@@ -208,30 +208,30 @@
 <div class="page-404">
   <div class="error-container">
     <div class="error-code">404</div>
-    <h1 class="error-title">Видео не найдено</h1>
+    <h1 class="error-title">Video Not Found</h1>
     <p class="error-message">
-      К сожалению, запрашиваемая страница не существует или была перемещена.<br>
-      Но не расстраивайтесь — у нас есть тысячи других качественных видео!
+      Sorry, the requested page does not exist or has been moved.<br>
+      But don't worry — we have thousands of other high-quality videos!
     </p>
     
     <div class="error-actions">
       <a href="{{ routes.all_products_collection_url | default: '/collections/all' }}" class="btn-primary">
         <span class="video-icon">🎬</span>
-        Просмотреть все видео
+        Browse All Videos
       </a>
       <a href="{{ routes.root_url }}" class="btn-secondary">
-        Вернуться на главную
+        Return to Home
       </a>
     </div>
     
     <div class="error-suggestions">
-      <h3 style="font-size: 1.25rem; font-weight: 600; color: #374151; margin-bottom: 0;">Популярные разделы:</h3>
+      <h3 style="font-size: 1.25rem; font-weight: 600; color: #374151; margin-bottom: 0;">Popular sections:</h3>
       <div class="suggestion-grid">
         <a href="{{ routes.collections_url }}" class="suggestion-item">
           <svg class="suggestion-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
           </svg>
-          <span>Коллекции</span>
+          <span>Collections</span>
         </a>
         
         {% comment %} Try to find some actual collections {% endcomment %}
@@ -241,7 +241,7 @@
           <svg class="suggestion-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
           </svg>
-          <span>{{ featured_collection.title | default: 'Рекомендуемое' }}</span>
+          <span>{{ featured_collection.title | default: 'Featured' }}</span>
         </a>
         {% endif %}
         
@@ -249,14 +249,14 @@
           <svg class="suggestion-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
           </svg>
-          <span>Поиск</span>
+          <span>Search</span>
         </a>
         
         <a href="{{ routes.root_url }}" class="suggestion-item">
           <svg class="suggestion-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
           </svg>
-          <span>Главная</span>
+          <span>Home</span>
         </a>
       </div>
     </div>

@@ -1,0 +1,531 @@
+{%- comment -%}
+  Enhanced Product Media Gallery v0.7 - DIRECT VIDEO PLAYBACK
+  - No placeholder images - direct video display
+  - Dynamic aspect ratio based on video resolution
+  - Perfect variant synchronization
+  - Improved UI design
+{%- endcomment -%}
+
+<div class="direct-media-gallery" data-product-id="{{ product.id }}">
+  <!-- Main Media Display -->
+  <div class="main-media-container" data-media-index="0">
+    {%- assign primary_media = product.selected_or_first_available_variant.featured_media | default: product.featured_media -%}
+    
+      {%- for media in product.media -%}
+      <div 
+        class="media-item{% if forloop.first %} active{% endif %}" 
+        data-media-index="{{ forloop.index0 }}"
+        data-variant-id="{{ media.variant_ids | join: ',' }}"
+        data-media-type="{{ media.media_type }}"
+        style="{% unless forloop.first %}display: none;{% endunless %}">
+        
+        {%- case media.media_type -%}
+          {%- when 'video' -%}
+            {%- comment -%} Direct video display with dynamic sizing {%- endcomment -%}
+            {%- assign video_resolution = product.metafields.custom.video_resolutions.value[forloop.index0] | default: "1920x1080" -%}
+            {%- assign resolution_parts = video_resolution | split: 'x' -%}
+            {%- assign video_width = resolution_parts[0] | plus: 0 | default: 1920 -%}
+            {%- assign video_height = resolution_parts[1] | plus: 0 | default: 1080 -%}
+            {%- assign aspect_ratio = video_width | divided_by: video_height | times: 100.0 | divided_by: 100.0 -%}
+            
+            <div class="video-container" 
+                 data-resolution="{{ video_resolution }}"
+                 data-duration="{{ product.metafields.custom.video_duration_.value[forloop.index0] }}"
+                 style="aspect-ratio: {{ aspect_ratio }};">
+              
+              <video 
+                class="direct-video"
+                controls 
+                preload="metadata"
+                playsinline
+                data-video-id="{{ media.id }}"
+                poster="{{ media.preview_image | image_url: width: 1200 }}">
+                <source src="{{ media.sources[0].url }}" type="video/mp4">
+                Your browser does not support video playback.
+              </video>
+              
+              {%- comment -%} Video metadata overlay {%- endcomment -%}
+              <div class="video-metadata-overlay">
+                {%- if product.metafields.custom.video_duration_.value[forloop.index0] -%}
+                  {%- assign duration_seconds = product.metafields.custom.video_duration_.value[forloop.index0] | plus: 0 -%}
+                  <span class="duration-badge">
+                    {%- if duration_seconds >= 60 -%}
+                      {%- assign minutes = duration_seconds | divided_by: 60 -%}
+                      {%- assign seconds = duration_seconds | modulo: 60 -%}
+                      {{ minutes }}:{{ seconds | prepend: '0' | slice: -2, 2 }}
+              {%- else -%}
+                      0:{{ duration_seconds | prepend: '0' | slice: -2, 2 }}
+                    {%- endif -%}
+                  </span>
+                {%- endif -%}
+                
+                {%- if video_resolution -%}
+                  <span class="resolution-badge">{{ video_resolution | replace: 'x', '×' }}</span>
+              {%- endif -%}
+              </div>
+            </div>
+            
+          {%- when 'image' -%}
+            <div class="image-container">
+              <img 
+                src="{{ media | image_url: width: 1200 }}"
+                alt="{{ media.alt | escape }}"
+                loading="lazy"
+                class="product-image">
+            </div>
+            
+          {%- else -%}
+            <div class="media-container">
+              {{ media | media_tag: loading: 'lazy' }}
+            </div>
+        {%- endcase -%}
+        </div>
+      {%- endfor -%}
+    </div>
+
+  <!-- Enhanced Thumbnails Row -->
+  {%- if product.media.size > 1 -%}
+    <div class="thumbnails-container">
+      <div class="thumbnails-row">
+        {%- for media in product.media -%}
+          <button 
+            class="thumbnail-item{% if forloop.first %} active{% endif %}"
+            data-media-index="{{ forloop.index0 }}"
+            data-variant-id="{{ media.variant_ids | join: ',' }}"
+            data-media-type="{{ media.media_type }}"
+            aria-label="View {{ media.media_type | capitalize }} {{ forloop.index }}">
+            
+            <div class="thumbnail-content">
+              {%- case media.media_type -%}
+                {%- when 'video' -%}
+                  <img 
+                    src="{{ media.preview_image | image_url: width: 150 }}" 
+                    alt="{{ media.alt | escape }}"
+                    loading="lazy"
+                    class="thumbnail-image">
+                  <div class="media-type-indicator video-indicator">
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="white">
+                      <polygon points="3,2 3,10 9,6" fill="currentColor"/>
+                    </svg>
+                  </div>
+                  
+                {%- when 'image' -%}
+                  <img 
+                    src="{{ media | image_url: width: 150 }}" 
+                    alt="{{ media.alt | escape }}"
+                    loading="lazy"
+                    class="thumbnail-image">
+                  <div class="media-type-indicator image-indicator">
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="white">
+                      <rect x="2" y="3" width="8" height="6" rx="1" fill="none" stroke="currentColor"/>
+                      <circle cx="5" cy="5.5" r="1" fill="currentColor"/>
+                    </svg>
+                  </div>
+                  
+                {%- else -%}
+                  {{ media | image_url: width: 150 | image_tag: loading: 'lazy', class: 'thumbnail-image' }}
+              {%- endcase -%}
+            </div>
+            
+            {%- comment -%} Thumbnail metadata {%- endcomment -%}
+            {%- if media.media_type == 'video' and product.metafields.custom.video_duration_.value[forloop.index0] -%}
+              {%- assign duration_seconds = product.metafields.custom.video_duration_.value[forloop.index0] | plus: 0 -%}
+              <div class="thumbnail-duration">
+                {%- if duration_seconds >= 60 -%}
+                  {%- assign minutes = duration_seconds | divided_by: 60 -%}
+                  {%- assign seconds = duration_seconds | modulo: 60 -%}
+                  {{ minutes }}:{{ seconds | prepend: '0' | slice: -2, 2 }}
+                {%- else -%}
+                  0:{{ duration_seconds | prepend: '0' | slice: -2, 2 }}
+                {%- endif -%}
+              </div>
+            {%- endif -%}
+          </button>
+        {%- endfor -%}
+      </div>
+      </div>
+    {%- endif -%}
+  </div>
+
+  <style>
+/* ENHANCED MEDIA GALLERY v0.7 - DIRECT VIDEO PLAYBACK */
+.direct-media-gallery {
+  width: 100%;
+  background: #ffffff;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e5e7eb;
+}
+
+.main-media-container {
+  position: relative;
+  width: 100%;
+  min-height: 300px;
+  background: #f8fafc;
+}
+
+.media-item {
+  position: relative;
+    width: 100%;
+  height: 100%;
+  }
+
+/* Direct Video Styling */
+.video-container {
+    position: relative;
+    width: 100%;
+    background: #000;
+  border-radius: 12px 12px 0 0;
+    overflow: hidden;
+  }
+
+.direct-video {
+    width: 100%;
+    height: 100%;
+  object-fit: contain;
+  background: #000;
+  display: block;
+  }
+
+.direct-video:focus {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+/* Video Metadata Overlay */
+.video-metadata-overlay {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+    display: flex;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.duration-badge, .resolution-badge {
+  background: rgba(0, 0, 0, 0.85);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+.resolution-badge {
+  background: rgba(16, 185, 129, 0.9);
+}
+
+/* Image Styling */
+  .image-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  background: #f8fafc;
+  }
+
+  .product-image {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+/* Enhanced Thumbnails */
+.thumbnails-container {
+  padding: 16px;
+  background: #ffffff;
+  border-top: 1px solid #e5e7eb;
+  }
+
+  .thumbnails-row {
+    display: flex;
+  gap: 12px;
+    overflow-x: auto;
+  padding: 4px;
+  scroll-behavior: smooth;
+}
+
+.thumbnails-row::-webkit-scrollbar {
+  height: 4px;
+}
+
+.thumbnails-row::-webkit-scrollbar-track {
+  background: #f3f4f6;
+  border-radius: 2px;
+}
+
+.thumbnails-row::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 2px;
+}
+
+.thumbnails-row::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+  }
+
+.thumbnail-item {
+    position: relative;
+    flex-shrink: 0;
+    width: 80px;
+    height: 60px;
+  border: 2px solid transparent;
+    border-radius: 8px;
+    overflow: hidden;
+  background: #f8fafc;
+    cursor: pointer;
+  transition: all 0.2s ease;
+    padding: 0;
+  }
+
+.thumbnail-item:hover {
+    border-color: #3b82f6;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+}
+
+.thumbnail-item.active {
+  border-color: #10b981;
+  box-shadow: 0 0 0 1px #10b981;
+}
+
+.thumbnail-content {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  }
+
+.thumbnail-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+.media-type-indicator {
+    position: absolute;
+  bottom: 4px;
+  right: 4px;
+  width: 20px;
+  height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  font-size: 10px;
+  }
+
+.video-indicator {
+  background: rgba(239, 68, 68, 0.9);
+  color: white;
+}
+
+.image-indicator {
+  background: rgba(59, 130, 246, 0.9);
+  color: white;
+}
+
+.thumbnail-duration {
+  position: absolute;
+  bottom: 2px;
+  left: 2px;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-size: 0.625rem;
+  font-weight: 600;
+}
+
+/* Responsive Design */
+@media (max-width: 749px) {
+  .direct-media-gallery {
+    border-radius: 12px;
+  }
+  
+  .main-media-container {
+    min-height: 250px;
+  }
+
+  .thumbnails-container {
+    padding: 12px;
+  }
+  
+  .thumbnail-item {
+    width: 60px;
+    height: 45px;
+  }
+  
+  .thumbnails-row {
+    gap: 8px;
+  }
+  
+  .video-metadata-overlay {
+    top: 8px;
+    left: 8px;
+    gap: 6px;
+  }
+  
+  .duration-badge, .resolution-badge {
+    padding: 2px 6px;
+    font-size: 0.625rem;
+  }
+}
+
+/* High-resolution displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .thumbnail-image {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+    }
+}
+
+/* Focus and accessibility */
+.thumbnail-item:focus {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+/* Loading state */
+.media-item.loading .direct-video {
+  opacity: 0.7;
+    }
+
+.media-item.loading::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 40px;
+  height: 40px;
+  border: 3px solid #f3f4f6;
+  border-top: 3px solid #3b82f6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(360deg); }
+  }
+  </style>
+
+  <script>
+  document.addEventListener('DOMContentLoaded', function() {
+  // Enhanced media gallery functionality v0.7
+  const gallery = document.querySelector('.direct-media-gallery');
+    if (!gallery) return;
+    
+  const mainContainer = gallery.querySelector('.main-media-container');
+  const thumbnails = gallery.querySelectorAll('.thumbnail-item');
+  let currentMediaIndex = 0;
+  
+  // Initialize gallery
+  initializeGallery();
+  
+  function initializeGallery() {
+    // Set up thumbnail click handlers
+    thumbnails.forEach((thumb, index) => {
+      thumb.addEventListener('click', function() {
+        switchToMedia(index);
+      });
+    });
+    
+    // Set up keyboard navigation
+    gallery.addEventListener('keydown', handleKeyboardNavigation);
+    
+    // Initialize first video if present
+    const firstVideo = mainContainer.querySelector('.direct-video');
+    if (firstVideo) {
+      setupVideoHandlers(firstVideo);
+    }
+  }
+  
+  function switchToMedia(mediaIndex) {
+    const mediaItems = mainContainer.querySelectorAll('.media-item');
+    const targetItem = mediaItems[mediaIndex];
+    
+    if (!targetItem) return;
+    
+    // Update active states
+    mediaItems.forEach(item => item.style.display = 'none');
+    thumbnails.forEach(thumb => thumb.classList.remove('active'));
+    
+    targetItem.style.display = 'block';
+    thumbnails[mediaIndex].classList.add('active');
+    
+    // Handle variant synchronization
+    const variantId = targetItem.dataset.variantId;
+    if (variantId && window.updateVariantFromMedia) {
+      window.updateVariantFromMedia(variantId);
+    }
+    
+    // Setup video if needed
+    const video = targetItem.querySelector('.direct-video');
+    if (video) {
+      setupVideoHandlers(video);
+    }
+    
+    currentMediaIndex = mediaIndex;
+    
+    // Trigger custom event
+    gallery.dispatchEvent(new CustomEvent('mediaChange', {
+      detail: {
+        mediaIndex: mediaIndex,
+        mediaType: targetItem.dataset.mediaType,
+        variantId: variantId
+      }
+    }));
+  }
+  
+  function setupVideoHandlers(video) {
+    video.addEventListener('loadstart', function() {
+      this.closest('.media-item').classList.add('loading');
+    });
+    
+    video.addEventListener('canplay', function() {
+      this.closest('.media-item').classList.remove('loading');
+    });
+    
+    video.addEventListener('error', function() {
+      console.warn('Video failed to load:', this.src);
+      this.closest('.media-item').classList.remove('loading');
+    });
+  }
+  
+  function handleKeyboardNavigation(e) {
+    if (e.key === 'ArrowLeft') {
+      e.preventDefault();
+      const prevIndex = currentMediaIndex > 0 ? currentMediaIndex - 1 : thumbnails.length - 1;
+      switchToMedia(prevIndex);
+    } else if (e.key === 'ArrowRight') {
+      e.preventDefault();
+      const nextIndex = currentMediaIndex < thumbnails.length - 1 ? currentMediaIndex + 1 : 0;
+      switchToMedia(nextIndex);
+    }
+  }
+  
+  // Expose gallery update function for variant synchronization
+  window.updateMediaGallery = function(variantId) {
+    const associatedThumb = gallery.querySelector(`[data-variant-id*="${variantId}"]`);
+    if (associatedThumb) {
+      const mediaIndex = Array.from(thumbnails).indexOf(associatedThumb);
+      if (mediaIndex !== -1) {
+        switchToMedia(mediaIndex);
+      }
+    }
+  };
+  
+  // Auto-play first video after a delay
+  setTimeout(() => {
+    const firstVideo = mainContainer.querySelector('.direct-video');
+    if (firstVideo && !firstVideo.paused) {
+      // Don't auto-play, let user control
+    }
+  }, 1000);
+  });
+  </script>

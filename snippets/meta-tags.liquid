@@ -101,7 +101,7 @@
           "name": "{{ shop.name | escape }}",
           "logo": {
             "@type": "ImageObject",
-            "url": "{{ settings.logo | image_url: width: 600 }}",
+            "url": "{{ shop.url | append: '/assets/logo.png' }}",
             "width": "600",
             "height": "60"
           },
@@ -161,7 +161,7 @@
           "name": "{{ shop.name | escape }}",
           "logo": {
             "@type": "ImageObject",
-            "url": "{{ settings.logo | image_url: width: 600 }}",
+            "url": "{{ shop.url | append: '/assets/logo.png' }}",
             "width": "600",
             "height": "60"
           },

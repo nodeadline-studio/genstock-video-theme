@@ -1,0 +1,33 @@
+# Shopify Theme - Development Files to Exclude
+
+# Development folder with all testing/debugging files
+development/
+
+# Node.js files (if any)
+node_modules/
+package*.json
+*.log
+
+# Development scripts
+*.test.js
+test-*
+debug-*
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Git files
+.git/
+.gitignore
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Development documentation
+CHANGELOG.md
+CONTRIBUTING.md 

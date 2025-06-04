@@ -10,9 +10,9 @@
   data-product-id="{{ product.id }}"
   data-update-url="false"
   data-url="{{ product.url }}"
-  {% if section.settings.image_zoom == 'hover' %}
+  {%- if section.settings.image_zoom == 'hover' %}
     data-zoom-on-hover
-  {% endif %}
+  {%- endif -%}
 >
   {{ 'section-main-product.css' | asset_url | stylesheet_tag }}
   {{ 'section-featured-product.css' | asset_url | stylesheet_tag }}
@@ -68,16 +68,16 @@
 
   {% assign variant_images = product.images | where: 'attached_to_variant?', true | map: 'src' %}
 
-  <section class="color-{{ section.settings.color_scheme }} {% if section.settings.secondary_background %}background-secondary{% else %}gradient{% endif %}">
-    <div class="page-width section-{{ section.id }}-padding{% if section.settings.secondary_background %} isolate{% endif %}">
-      <div class="featured-product product product--{{ section.settings.media_size }} grid grid--1-col gradient color-{{ section.settings.color_scheme }} product--{{ section.settings.media_position }}{% if section.settings.secondary_background == false %} isolate{% endif %} {% if product.media.size > 0 or section.settings.product == blank %}grid--2-col-tablet{% else %}product--no-media{% endif %}">
+  <section class="color-{{ section.settings.color_scheme }} {%- if section.settings.secondary_background %}background-secondary{% else %}gradient{%- endif -%}">
+    <div class="page-width section-{{ section.id }}-padding{%- if section.settings.secondary_background %} isolate{%- endif -%}">
+      <div class="featured-product product product--{{ section.settings.media_size }} grid grid--1-col gradient color-{{ section.settings.color_scheme }} product--{{ section.settings.media_position }}{%- if section.settings.secondary_background == false %} isolate{%- endif -%} {%- if product.media.size > 0 or section.settings.product == blank %}grid--2-col-tablet{% else %}product--no-media{%- endif -%}">
         <div class="grid__item product__media-wrapper">
           {%- unless placeholder -%}
             {% render 'product-media-gallery', product: product, variant_images: variant_images, limit: 1 %}
           {%- else -%}
             <div class="product__media-item">
               <div
-                class="product-media-container global-media-settings gradient{% if section.settings.constrain_to_viewport %} constrain-height{% endif %}"
+                class="product-media-container global-media-settings gradient{%- if section.settings.constrain_to_viewport %} constrain-height{%- endif -%}"
                 style="--ratio: 1.0; --preview-ratio: 1.0;"
               >
                 {{ 'product-apparel-1' | placeholder_svg_tag: 'placeholder-svg' }}
@@ -85,7 +85,7 @@
             </div>
           {%- endunless -%}
         </div>
-        <div class="product__info-wrapper grid__item{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}">
+        <div class="product__info-wrapper grid__item{%- if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{%- endif -%}">
           <section
             id="ProductInfo-{{ section.id }}"
             class="product__info-container"
@@ -100,7 +100,7 @@
                   {% render block %}
                 {%- when 'text' -%}
                   <p
-                    class="product__text inline-richtext{% if block.settings.text_style == 'uppercase' %} caption-with-letter-spacing{% elsif block.settings.text_style == 'subtitle' %} subtitle{% endif %}"
+                    class="product__text inline-richtext{%- if block.settings.text_style == 'uppercase' %} caption-with-letter-spacing{% elsif block.settings.text_style == 'subtitle' %} subtitle{%- endif -%}"
                     {{ block.shopify_attributes }}
                   >
                     {{- block.settings.text -}}
@@ -152,7 +152,7 @@
                   {%- endunless -%}
                 {%- when 'sku' -%}
                   <p
-                    class="product__sku{% if block.settings.text_style == 'uppercase' %} caption-with-letter-spacing{% elsif block.settings.text_style == 'subtitle' %} subtitle{% endif %}{% if product.selected_or_first_available_variant.sku.size == 0 %} visibility-hidden{% endif %}"
+                    class="product__sku{%- if block.settings.text_style == 'uppercase' %} caption-with-letter-spacing{% elsif block.settings.text_style == 'subtitle' %} subtitle{%- endif -%}{%- if product.selected_or_first_available_variant.sku.size == 0 %} visibility-hidden{%- endif -%}"
                     id="Sku-{{ section.id }}"
                     role="status"
                     {{ block.shopify_attributes }}
@@ -163,7 +163,7 @@
                 {%- when 'quantity_selector' -%}
                   <div
                     id="Quantity-Form-{{ section.id }}"
-                    class="product-form__input product-form__quantity{% if settings.inputs_shadow_vertical_offset != 0 and settings.inputs_shadow_vertical_offset < 0 %} product-form__quantity-top{% endif %}"
+                    class="product-form__input product-form__quantity{%- if settings.inputs_shadow_vertical_offset != 0 and settings.inputs_shadow_vertical_offset < 0 %} product-form__quantity-top{%- endif -%}"
                     {{ block.shopify_attributes }}
                   >
                     {% comment %} TODO: enable theme-check once `item_count_for_variant` is accepted as valid filter {% endcomment %}
@@ -174,7 +174,7 @@
                     {% # theme-check-enable %}
                     <label class="quantity__label form__label" for="Quantity-{{ section.id }}">
                       {{ 'products.product.quantity.label' | t }}
-                      <span class="quantity__rules-cart{% if cart_qty == 0 %} hidden{% endif %}">
+                      <span class="quantity__rules-cart{%- if cart_qty == 0 %} hidden{%- endif -%}">
                         {%- render 'loading-spinner' -%}
                         <span
                           >(
@@ -201,10 +201,10 @@
                           data-cart-quantity="{{ cart_qty }}"
                           data-min="{{ product.selected_or_first_available_variant.quantity_rule.min }}"
                           min="{{ product.selected_or_first_available_variant.quantity_rule.min }}"
-                          {% if product.selected_or_first_available_variant.quantity_rule.max != null %}
+                          {%- if product.selected_or_first_available_variant.quantity_rule.max != null %}
                             data-max="{{ product.selected_or_first_available_variant.quantity_rule.max }}"
                             max="{{ product.selected_or_first_available_variant.quantity_rule.max }}"
-                          {% endif %}
+                          {%- endif -%}
                           step="{{ product.selected_or_first_available_variant.quantity_rule.increment }}"
                           value="{{ product.selected_or_first_available_variant.quantity_rule.min }}"
                           form="{{ product_form_id }}"
@@ -437,11 +437,11 @@
               {%- endcase -%}
             {%- endfor -%}
             <a
-              {% if product == blank %}
+              {%- if product == blank %}
                 role="link" aria-disabled="true"
               {% else %}
                 href="{{ product.url }}"
-              {% endif %}
+              {%- endif -%}
               class="link product__view-details animate-arrow"
             >
               {{ 'products.product.view_full_details' | t }}
@@ -457,7 +457,7 @@
   <script src="{{ 'product-form.js' | asset_url }}" defer="defer"></script>
   {%- if section.settings.image_zoom == 'hover' -%}
     <script id="EnableZoomOnHover-featured" src="{{ 'magnify.js' | asset_url }}" defer="defer"></script>
-  {%- endif %}
+  {%- endif -%}
   {%- if request.design_mode -%}
     <script src="{{ 'theme-editor.js' | asset_url }}" defer="defer"></script>
   {%- endif -%}
@@ -481,10 +481,10 @@
     {{ product | structured_data }}
   </script>
 
-  {% if product.media.size > 0 %}
+  {%- if product.media.size > 0 %}
     <script src="{{ 'product-modal.js' | asset_url }}" defer="defer"></script>
     <script src="{{ 'media-gallery.js' | asset_url }}" defer="defer"></script>
-  {% endif %}
+  {%- endif -%}
 </product-info>
 
 {% schema %}

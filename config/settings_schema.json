@@ -1465,5 +1465,190 @@
         "default": "scheme-1"
       }
     ]
+  },
+  {
+    "name": "🎬 GenStock Video Settings",
+    "settings": [
+      {
+        "type": "header",
+        "content": "🎥 Auto-Swap Gallery Behavior"
+      },
+      {
+        "type": "checkbox",
+        "id": "enable_auto_swap",
+        "label": "Enable auto-swap gallery",
+        "info": "1st image and 2nd video automatically swap positions when video loads",
+        "default": true
+      },
+      {
+        "type": "select",
+        "id": "swap_trigger",
+        "label": "Swap trigger event",
+        "options": [
+          {"value": "onload", "label": "When video loads"},
+          {"value": "onplay", "label": "When video starts playing"},
+          {"value": "onhover", "label": "On video hover"},
+          {"value": "onclick", "label": "On video click"}
+        ],
+        "default": "onload",
+        "info": "Choose when the media positions should swap"
+      },
+      {
+        "type": "select",
+        "id": "swap_animation_speed",
+        "label": "Swap animation speed",
+        "options": [
+          {"value": "fast", "label": "Fast (0.3s)"},
+          {"value": "medium", "label": "Medium (0.5s)"},
+          {"value": "slow", "label": "Slow (0.8s)"},
+          {"value": "instant", "label": "Instant (no animation)"}
+        ],
+        "default": "fast",
+        "info": "Speed of the position swap animation"
+      },
+      {
+        "type": "checkbox",
+        "id": "show_swap_indicators",
+        "label": "Show swap indicators",
+        "info": "Display 'Moving to Top' and 'Moving Down' indicators during swap",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "preserve_original_order",
+        "label": "Preserve original order in session",
+        "info": "Remember the swapped positions during the user session",
+        "default": true
+      },
+      {
+        "type": "header",
+        "content": "🎮 Video Preview Controls"
+      },
+      {
+        "type": "checkbox",
+        "id": "video_autoplay_hover",
+        "label": "Auto-play videos on hover",
+        "info": "Videos start playing when user hovers over them",
+        "default": false
+      },
+      {
+        "type": "checkbox",
+        "id": "video_loop",
+        "label": "Loop videos automatically",
+        "info": "Videos restart automatically when they finish",
+        "default": true
+      },
+      {
+        "type": "select",
+        "id": "video_controls",
+        "label": "Video controls visibility",
+        "options": [
+          {"value": "always", "label": "Always visible"},
+          {"value": "hover", "label": "Show on hover"},
+          {"value": "never", "label": "Never show"}
+        ],
+        "default": "hover",
+        "info": "When to show video playback controls"
+      },
+      {
+        "type": "range",
+        "id": "preview_thumbnail_count",
+        "min": 2,
+        "max": 8,
+        "step": 1,
+        "default": 4,
+        "label": "Maximum thumbnails to display",
+        "info": "Number of media thumbnails shown in gallery navigation"
+      },
+      {
+        "type": "header",
+        "content": "🎨 Gallery Layout & Design"
+      },
+      {
+        "type": "select",
+        "id": "gallery_layout_style",
+        "label": "Gallery layout style",
+        "options": [
+          {"value": "modern", "label": "Modern Grid"},
+          {"value": "classic", "label": "Classic Two-Column"},
+          {"value": "video-focus", "label": "Video-Focused"},
+          {"value": "mobile-first", "label": "Mobile-First Vertical"}
+        ],
+        "default": "modern",
+        "info": "Choose the overall layout style for product galleries"
+      },
+      {
+        "type": "select",
+        "id": "gallery_aspect_ratio",
+        "label": "Video aspect ratio",
+        "options": [
+          {"value": "16-9", "label": "16:9 (Widescreen)"},
+          {"value": "4-3", "label": "4:3 (Standard)"},
+          {"value": "1-1", "label": "1:1 (Square)"},
+          {"value": "auto", "label": "Auto (Original ratio)"}
+        ],
+        "default": "16-9",
+        "info": "Aspect ratio for video display containers"
+      },
+      {
+        "type": "range",
+        "id": "gallery_border_radius",
+        "min": 0,
+        "max": 24,
+        "step": 2,
+        "default": 12,
+        "unit": "px",
+        "label": "Gallery border radius",
+        "info": "Roundness of gallery container corners"
+      },
+      {
+        "type": "header",
+        "content": "🎯 Advanced Features"
+      },
+      {
+        "type": "checkbox",
+        "id": "enable_video_analytics",
+        "label": "Enable video analytics",
+        "info": "Track video play events and user interactions",
+        "default": false
+      },
+      {
+        "type": "checkbox",
+        "id": "preload_videos",
+        "label": "Preload videos",
+        "info": "Load video files in background for faster playback",
+        "default": false
+      },
+      {
+        "type": "select",
+        "id": "fallback_image_priority",
+        "label": "Fallback image priority",
+        "options": [
+          {"value": "first", "label": "First image"},
+          {"value": "featured", "label": "Featured image"},
+          {"value": "last", "label": "Last image"}
+        ],
+        "default": "first",
+        "info": "Which image to show if video fails to load"
+      },
+      {
+        "type": "header",
+        "content": "🔧 Developer Options"
+      },
+      {
+        "type": "checkbox",
+        "id": "debug_mode",
+        "label": "Enable debug mode",
+        "info": "Show console logging for troubleshooting (development only)",
+        "default": false
+      },
+      {
+        "type": "checkbox",
+        "id": "performance_monitoring",
+        "label": "Enable performance monitoring",
+        "info": "Track gallery loading times and optimize performance",
+        "default": false
+      }
+    ]
   }
 ]

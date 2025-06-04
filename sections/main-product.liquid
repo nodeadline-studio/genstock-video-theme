@@ -826,9 +826,10 @@
   <div class="page-width">
     <div class="product product--{{ section.settings.media_size }} product--{{ section.settings.media_position }} product--{{ section.settings.gallery_layout }} product--mobile-{{ section.settings.mobile_thumbnails }} grid grid--1-col {% if product.media.size > 0 %}grid--2-col-tablet{% else %}product--no-media{% endif %}">
       
-      <!-- Enhanced Media Gallery Section -->
+      <!-- Enhanced Media Gallery Section with Custom Variables -->
       <div class="grid__item product__media-wrapper">
-        {% render 'enhanced-product-media-gallery' %}
+        {%- comment -%} Custom Gallery with User Settings {%- endcomment -%}
+        {% render 'enhanced-product-media-gallery-custom' %}
       </div>
       
       <!-- Product Information Section -->
@@ -853,6 +854,49 @@
               {%- when 'title' -%}
                 <div class="product__title" {{ block.shopify_attributes }}>
                   <h1>{{ product.title | escape }}</h1>
+
+{%- comment -%} Enhanced Video Specifications Display {%- endcomment -%}
+{%- if product.metafields.custom.video_duration_ or product.metafields.custom.video_resolutions -%}
+  <div class="video-specs-enhanced" style="margin: 1rem 0; padding: 1rem; background: #f8fafc; border-radius: 8px; border: 1px solid #e5e7eb;">
+    <h3 style="margin: 0 0 0.5rem 0; font-size: 1rem; color: #374151;">📹 Video Specifications</h3>
+    <div class="specs-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; font-size: 0.9rem;">
+      {%- if product.metafields.custom.video_duration_.value[0] -%}
+        {%- assign duration_seconds = product.metafields.custom.video_duration_.value[0] | plus: 0 -%}
+        <div class="spec-item">
+          <strong>Duration:</strong>
+          <span class="duration-formatted">
+            {%- if duration_seconds >= 60 -%}
+              {%- assign minutes = duration_seconds | divided_by: 60 -%}
+              {%- assign seconds = duration_seconds | modulo: 60 -%}
+              {{ minutes }}:{{ seconds | prepend: '0' | slice: -2, 2 }}
+            {%- else -%}
+              0:{{ duration_seconds | prepend: '0' | slice: -2, 2 }}
+            {%- endif -%}
+          </span>
+        </div>
+      {%- endif -%}
+      
+      {%- if product.metafields.custom.video_resolutions.value[0] -%}
+        <div class="spec-item">
+          <strong>Resolution:</strong>
+          <span class="resolution-formatted">{{ product.metafields.custom.video_resolutions.value[0] | replace: 'x', '×' }}</span>
+        </div>
+      {%- endif -%}
+      
+      {%- if product.media.size > 0 -%}
+        <div class="spec-item">
+          <strong>Format:</strong>
+          <span>MP4 Video</span>
+        </div>
+      {%- endif -%}
+      
+      <div class="spec-item">
+        <strong>Quality:</strong>
+        <span style="color: #10b981; font-weight: 600;">Professional HD</span>
+      </div>
+    </div>
+  </div>
+{%- endif -%}
                 </div>
                 
                 <!-- Enhanced Product Meta Display -->
@@ -978,8 +1022,96 @@
             {% render 'social-sharing-system' %}
           </div>
           
-        </section>
-      </div>
+        
+<style>
+  .visually-hidden {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+  }
+</style>
+
+<style>
+  /* Mobile Responsiveness Enhancements for GenStock Video Products */
+  @media screen and (max-width: 749px) {
+    .product-main {
+      padding: 1rem 0.5rem;
+    }
+    
+    .product-media-container {
+      margin-bottom: 1.5rem;
+    }
+    
+    .video-container {
+      max-height: 60vh;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    
+    .direct-video {
+      border-radius: 8px;
+    }
+    
+    .thumbnails-row {
+      gap: 8px;
+      padding: 0.5rem;
+    }
+    
+    .thumbnail-item {
+      width: 60px;
+      height: 45px;
+      min-width: 60px;
+    }
+    
+    .product-info {
+      padding: 1rem 0;
+    }
+    
+    .product-form {
+      margin-top: 1rem;
+    }
+    
+    .dynamic-checkout-container {
+      margin-top: 1rem;
+    }
+    
+    /* Video metadata badges responsive */
+    .video-metadata-overlay {
+      top: 8px;
+      left: 8px;
+      gap: 6px;
+    }
+    
+    .duration-badge, .resolution-badge {
+      padding: 3px 6px;
+      font-size: 0.7rem;
+    }
+  }
+  
+  @media screen and (max-width: 480px) {
+    .product-main {
+      padding: 0.5rem;
+    }
+    
+    .thumbnails-row {
+      gap: 6px;
+    }
+    
+    .thumbnail-item {
+      width: 50px;
+      height: 38px;
+      min-width: 50px;
+    }
+  }
+</style>
+</section>
+    </div>
     </div>
   </div>
   

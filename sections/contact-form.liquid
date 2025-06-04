@@ -17,7 +17,7 @@
 <div class="color-{{ section.settings.color_scheme }} gradient">
   <div class="contact page-width page-width--narrow section-{{ section.id }}-padding">
     {%- if section.settings.heading != blank -%}
-      <h2 class="title title-wrapper--no-top-margin inline-richtext {{ section.settings.heading_size }}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}">
+      <h2 class="title title-wrapper--no-top-margin inline-richtext {{ section.settings.heading_size }}{%- if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{%- endif -%}">
         {{ section.settings.heading }}
       </h2>
     {%- else -%}
@@ -59,7 +59,7 @@
             type="text"
             id="ContactForm-name"
             name="contact[{{ 'templates.contact.form.name' | t }}]"
-            value="{% if form.name %}{{ form.name }}{% elsif customer %}{{ customer.name }}{% endif %}"
+            value="{%- if form.name %}{{ form.name }}{% elsif customer %}{{ customer.name }}{%- endif -%}"
             placeholder="{{ 'templates.contact.form.name' | t }}"
           >
           <label class="field__label" for="ContactForm-name">{{ 'templates.contact.form.name' | t }}</label>
@@ -73,12 +73,12 @@
             name="contact[email]"
             spellcheck="false"
             autocapitalize="off"
-            value="{% if form.email %}{{ form.email }}{% elsif customer %}{{ customer.email }}{% endif %}"
+            value="{%- if form.email %}{{ form.email }}{% elsif customer %}{{ customer.email }}{%- endif -%}"
             aria-required="true"
-            {% if form.errors contains 'email' %}
+            {%- if form.errors contains 'email' %}
               aria-invalid="true"
               aria-describedby="ContactForm-email-error"
-            {% endif %}
+            {%- endif -%}
             placeholder="{{ 'templates.contact.form.email' | t }}"
           >
           <label class="field__label" for="ContactForm-email">
@@ -107,7 +107,7 @@
           autocomplete="tel"
           name="contact[{{ 'templates.contact.form.phone' | t }}]"
           pattern="[0-9\-]*"
-          value="{% if form.phone %}{{ form.phone }}{% elsif customer %}{{ customer.phone }}{% endif %}"
+          value="{%- if form.phone %}{{ form.phone }}{% elsif customer %}{{ customer.phone }}{%- endif -%}"
           placeholder="{{ 'templates.contact.form.phone' | t }}"
         >
         <label class="field__label" for="ContactForm-phone">{{ 'templates.contact.form.phone' | t }}</label>
