@@ -1,21 +1,18 @@
-{%- comment -%}
-  Enhanced Product Media Gallery v0.7 - DIRECT VIDEO PLAYBACK
+{% comment %}
+  Enhanced Product Media Gallery v0.8 - DIRECT VIDEO PLAYBACK - PRODUCTION READY
   - No placeholder images - direct video display
   - Dynamic aspect ratio based on video resolution
   - Perfect variant synchronization
-  - Improved UI design
-{%- endcomment -%}
+  - Fixed video timing and preview issues
+  - Professional UI design
+{% endcomment %}
 
 <div class="direct-media-gallery" data-product-id="{{ product.id }}">
   <!-- Main Media Display -->
   <div class="main-media-container" data-media-index="0">
     {%- assign primary_media = product.selected_or_first_available_variant.featured_media | default: product.featured_media -%}
     
-<<<<<<< HEAD
-      {%- for media in product.media -%}
-=======
     {%- for media in product.media -%}
->>>>>>> 3826508a52e0f0338250c93f86b00d4f80323a85
       <div 
         class="media-item{% if forloop.first %} active{% endif %}" 
         data-media-index="{{ forloop.index0 }}"
@@ -57,11 +54,7 @@
                       {%- assign minutes = duration_seconds | divided_by: 60 -%}
                       {%- assign seconds = duration_seconds | modulo: 60 -%}
                       {{ minutes }}:{{ seconds | prepend: '0' | slice: -2, 2 }}
-<<<<<<< HEAD
-              {%- else -%}
-=======
                     {%- else -%}
->>>>>>> 3826508a52e0f0338250c93f86b00d4f80323a85
                       0:{{ duration_seconds | prepend: '0' | slice: -2, 2 }}
                     {%- endif -%}
                   </span>
@@ -69,11 +62,7 @@
                 
                 {%- if video_resolution -%}
                   <span class="resolution-badge">{{ video_resolution | replace: 'x', '×' }}</span>
-<<<<<<< HEAD
-              {%- endif -%}
-=======
                 {%- endif -%}
->>>>>>> 3826508a52e0f0338250c93f86b00d4f80323a85
               </div>
             </div>
             
@@ -91,15 +80,9 @@
               {{ media | media_tag: loading: 'lazy' }}
             </div>
         {%- endcase -%}
-<<<<<<< HEAD
-        </div>
-      {%- endfor -%}
-    </div>
-=======
       </div>
     {%- endfor -%}
   </div>
->>>>>>> 3826508a52e0f0338250c93f86b00d4f80323a85
 
   <!-- Enhanced Thumbnails Row -->
   {%- if product.media.size > 1 -%}
@@ -161,20 +144,12 @@
           </button>
         {%- endfor -%}
       </div>
-<<<<<<< HEAD
-      </div>
-    {%- endif -%}
-  </div>
-
-  <style>
-=======
     </div>
   {%- endif -%}
 </div>
 
 <style>
->>>>>>> 3826508a52e0f0338250c93f86b00d4f80323a85
-/* ENHANCED MEDIA GALLERY v0.7 - DIRECT VIDEO PLAYBACK */
+/* ENHANCED MEDIA GALLERY v0.8 - PROFESSIONAL VIDEO STORE 2025 */
 .direct-media-gallery {
   width: 100%;
   background: #ffffff;
@@ -193,222 +168,145 @@
 
 .media-item {
   position: relative;
-<<<<<<< HEAD
-    width: 100%;
-  height: 100%;
-  }
-
-/* Direct Video Styling */
-.video-container {
-    position: relative;
-    width: 100%;
-    background: #000;
-  border-radius: 12px 12px 0 0;
-    overflow: hidden;
-  }
-
-.direct-video {
-    width: 100%;
-    height: 100%;
-  object-fit: contain;
-  background: #000;
-  display: block;
-  }
-=======
   width: 100%;
   height: 100%;
 }
 
-/* Direct Video Styling */
+/* Video Container - Responsive Aspect Ratios */
 .video-container {
   position: relative;
   width: 100%;
-  background: #000;
-  border-radius: 12px 12px 0 0;
+  background: #000000;
+  border-radius: 12px;
   overflow: hidden;
+  margin: 1rem;
+  /* Dynamic aspect ratio set via inline style */
 }
 
 .direct-video {
   width: 100%;
   height: 100%;
-  object-fit: contain;
-  background: #000;
-  display: block;
-}
->>>>>>> 3826508a52e0f0338250c93f86b00d4f80323a85
-
-.direct-video:focus {
-  outline: 2px solid #2563eb;
-  outline-offset: 2px;
+  object-fit: contain; /* Maintain aspect ratio without cropping */
+  background: #000000;
+  border-radius: 8px;
 }
 
 /* Video Metadata Overlay */
 .video-metadata-overlay {
   position: absolute;
   top: 12px;
-  left: 12px;
-<<<<<<< HEAD
-    display: flex;
-=======
+  right: 12px;
   display: flex;
->>>>>>> 3826508a52e0f0338250c93f86b00d4f80323a85
   gap: 8px;
-  pointer-events: none;
+  z-index: 10;
 }
 
-.duration-badge, .resolution-badge {
-  background: rgba(0, 0, 0, 0.85);
+.duration-badge,
+.resolution-badge {
+  background: rgba(0, 0, 0, 0.8);
   color: white;
   padding: 4px 8px;
   border-radius: 6px;
   font-size: 0.75rem;
   font-weight: 600;
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-<<<<<<< HEAD
-  }
-=======
+  backdrop-filter: blur(4px);
 }
->>>>>>> 3826508a52e0f0338250c93f86b00d4f80323a85
+
+.duration-badge {
+  background: rgba(59, 130, 246, 0.9);
+}
 
 .resolution-badge {
   background: rgba(16, 185, 129, 0.9);
 }
 
-/* Image Styling */
-<<<<<<< HEAD
-  .image-container {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  background: #f8fafc;
-  }
-
-  .product-image {
-=======
+/* Image Container */
 .image-container {
+  position: relative;
   width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #f8fafc;
+  margin: 1rem;
 }
 
 .product-image {
->>>>>>> 3826508a52e0f0338250c93f86b00d4f80323a85
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
+  width: 100%;
+  height: auto;
+  object-fit: cover;
   border-radius: 8px;
 }
 
-/* Enhanced Thumbnails */
+/* Thumbnails Section */
 .thumbnails-container {
-  padding: 16px;
-  background: #ffffff;
+  padding: 1rem;
+  background: #f9fafb;
   border-top: 1px solid #e5e7eb;
-<<<<<<< HEAD
-  }
-
-  .thumbnails-row {
-    display: flex;
-  gap: 12px;
-    overflow-x: auto;
-=======
 }
 
 .thumbnails-row {
   display: flex;
-  gap: 12px;
+  gap: 0.75rem;
   overflow-x: auto;
->>>>>>> 3826508a52e0f0338250c93f86b00d4f80323a85
-  padding: 4px;
-  scroll-behavior: smooth;
+  padding: 0.5rem;
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 #f1f5f9;
 }
 
 .thumbnails-row::-webkit-scrollbar {
-  height: 4px;
+  height: 6px;
 }
 
 .thumbnails-row::-webkit-scrollbar-track {
-  background: #f3f4f6;
-  border-radius: 2px;
+  background: #f1f5f9;
+  border-radius: 3px;
 }
 
 .thumbnails-row::-webkit-scrollbar-thumb {
-  background: #d1d5db;
-  border-radius: 2px;
-}
-
-.thumbnails-row::-webkit-scrollbar-thumb:hover {
-  background: #9ca3af;
-<<<<<<< HEAD
-  }
-
-.thumbnail-item {
-    position: relative;
-    flex-shrink: 0;
-    width: 80px;
-    height: 60px;
-  border: 2px solid transparent;
-    border-radius: 8px;
-    overflow: hidden;
-  background: #f8fafc;
-    cursor: pointer;
-  transition: all 0.2s ease;
-    padding: 0;
-  }
-
-.thumbnail-item:hover {
-    border-color: #3b82f6;
-=======
+  background: #cbd5e1;
+  border-radius: 3px;
 }
 
 .thumbnail-item {
   position: relative;
-  flex-shrink: 0;
-  width: 80px;
-  height: 60px;
+  flex: 0 0 auto;
+  width: 100px;
+  height: 100px;
   border: 2px solid transparent;
-  border-radius: 8px;
+  border-radius: 12px;
   overflow: hidden;
-  background: #f8fafc;
   cursor: pointer;
-  transition: all 0.2s ease;
-  padding: 0;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive thumbnail sizes */
+@media (min-width: 990px) {
+  .thumbnail-item {
+    width: 100px;
+    height: 100px;
+  }
+}
+
+@media (min-width: 750px) and (max-width: 989px) {
+  .thumbnail-item {
+    width: 80px;
+    height: 80px;
+  }
 }
 
 .thumbnail-item:hover {
-  border-color: #3b82f6;
->>>>>>> 3826508a52e0f0338250c93f86b00d4f80323a85
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+  transform: scale(1.05);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
 }
 
 .thumbnail-item.active {
-  border-color: #10b981;
-  box-shadow: 0 0 0 1px #10b981;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
 }
 
 .thumbnail-content {
   position: relative;
   width: 100%;
   height: 100%;
-<<<<<<< HEAD
-  }
-
-.thumbnail-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
-.media-type-indicator {
-    position: absolute;
-=======
 }
 
 .thumbnail-image {
@@ -419,264 +317,226 @@
 
 .media-type-indicator {
   position: absolute;
->>>>>>> 3826508a52e0f0338250c93f86b00d4f80323a85
-  bottom: 4px;
+  top: 4px;
   right: 4px;
   width: 20px;
   height: 20px;
-<<<<<<< HEAD
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  font-size: 10px;
-  }
-=======
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 10px;
+  backdrop-filter: blur(4px);
 }
->>>>>>> 3826508a52e0f0338250c93f86b00d4f80323a85
 
 .video-indicator {
-  background: rgba(239, 68, 68, 0.9);
-  color: white;
+  background: rgba(59, 130, 246, 0.9);
 }
 
 .image-indicator {
-  background: rgba(59, 130, 246, 0.9);
-  color: white;
+  background: rgba(16, 185, 129, 0.9);
 }
 
 .thumbnail-duration {
   position: absolute;
   bottom: 2px;
-  left: 2px;
+  right: 2px;
   background: rgba(0, 0, 0, 0.8);
   color: white;
-  padding: 1px 4px;
-  border-radius: 3px;
   font-size: 0.625rem;
+  padding: 2px 4px;
+  border-radius: 3px;
   font-weight: 600;
 }
 
 /* Responsive Design */
-@media (max-width: 749px) {
+@media (max-width: 768px) {
   .direct-media-gallery {
-    border-radius: 12px;
+    border-radius: 8px;
   }
   
-  .main-media-container {
-    min-height: 250px;
+  .video-container,
+  .image-container {
+    margin: 0.5rem;
   }
-<<<<<<< HEAD
-
-=======
   
->>>>>>> 3826508a52e0f0338250c93f86b00d4f80323a85
-  .thumbnails-container {
-    padding: 12px;
+  .direct-video {
+    border-radius: 6px;
   }
   
   .thumbnail-item {
-    width: 60px;
-    height: 45px;
+    width: 80px;
+    height: 80px;
+  }
+  
+  .thumbnails-container {
+    padding: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .thumbnail-item {
+    width: 70px;
+    height: 70px;
   }
   
   .thumbnails-row {
-    gap: 8px;
-  }
-  
-  .video-metadata-overlay {
-    top: 8px;
-    left: 8px;
-    gap: 6px;
-  }
-  
-  .duration-badge, .resolution-badge {
-    padding: 2px 6px;
-    font-size: 0.625rem;
+    gap: 0.5rem;
   }
 }
 
-/* High-resolution displays */
-@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
-  .thumbnail-image {
-    image-rendering: -webkit-optimize-contrast;
-    image-rendering: crisp-edges;
-<<<<<<< HEAD
-    }
-=======
-  }
->>>>>>> 3826508a52e0f0338250c93f86b00d4f80323a85
+/* Professional Loading States */
+.media-item:not(.active) {
+  display: none;
 }
 
-/* Focus and accessibility */
-.thumbnail-item:focus {
-  outline: 2px solid #2563eb;
-  outline-offset: 2px;
+.direct-video:not([data-loaded]) {
+  background: linear-gradient(45deg, #f3f4f6 25%, transparent 25%), 
+              linear-gradient(-45deg, #f3f4f6 25%, transparent 25%), 
+              linear-gradient(45deg, transparent 75%, #f3f4f6 75%), 
+              linear-gradient(-45deg, transparent 75%, #f3f4f6 75%);
+  background-size: 20px 20px;
+  background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+  animation: loading-shimmer 2s linear infinite;
 }
 
-/* Loading state */
-.media-item.loading .direct-video {
-  opacity: 0.7;
-<<<<<<< HEAD
-    }
-=======
-}
->>>>>>> 3826508a52e0f0338250c93f86b00d4f80323a85
-
-.media-item.loading::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 40px;
-  height: 40px;
-  border: 3px solid #f3f4f6;
-  border-top: 3px solid #3b82f6;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  0% { transform: translate(-50%, -50%) rotate(0deg); }
-  100% { transform: translate(-50%, -50%) rotate(360deg); }
-<<<<<<< HEAD
-  }
-  </style>
-
-  <script>
-  document.addEventListener('DOMContentLoaded', function() {
-  // Enhanced media gallery functionality v0.7
-  const gallery = document.querySelector('.direct-media-gallery');
-    if (!gallery) return;
-    
-=======
+@keyframes loading-shimmer {
+  0% { background-position: 0 0, 0 10px, 10px -10px, -10px 0px; }
+  100% { background-position: 20px 20px, 20px 30px, 30px 10px, 10px 20px; }
 }
 </style>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-  // Enhanced media gallery functionality v0.7
+// Enhanced Media Gallery JavaScript v0.8
+(function() {
+  'use strict';
+  
   const gallery = document.querySelector('.direct-media-gallery');
   if (!gallery) return;
   
->>>>>>> 3826508a52e0f0338250c93f86b00d4f80323a85
   const mainContainer = gallery.querySelector('.main-media-container');
   const thumbnails = gallery.querySelectorAll('.thumbnail-item');
-  let currentMediaIndex = 0;
+  const mediaItems = gallery.querySelectorAll('.media-item');
   
   // Initialize gallery
-  initializeGallery();
-  
-  function initializeGallery() {
-    // Set up thumbnail click handlers
-    thumbnails.forEach((thumb, index) => {
-      thumb.addEventListener('click', function() {
+  function initGallery() {
+    // Add click handlers to thumbnails
+    thumbnails.forEach((thumbnail, index) => {
+      thumbnail.addEventListener('click', (e) => {
+        e.preventDefault();
         switchToMedia(index);
+        
+        // Provide visual feedback
+        thumbnail.style.transform = 'scale(0.95)';
+        setTimeout(() => {
+          thumbnail.style.transform = '';
+        }, 150);
       });
     });
     
-    // Set up keyboard navigation
-    gallery.addEventListener('keydown', handleKeyboardNavigation);
+    // Initialize videos
+    initializeVideos();
     
-    // Initialize first video if present
-    const firstVideo = mainContainer.querySelector('.direct-video');
-    if (firstVideo) {
-      setupVideoHandlers(firstVideo);
-    }
+    // Handle variant changes - listen to both events
+    document.addEventListener('variant:change', handleVariantChange);
+    document.addEventListener('gallery:variant-change', handleVariantChange);
   }
   
-  function switchToMedia(mediaIndex) {
-    const mediaItems = mainContainer.querySelectorAll('.media-item');
-    const targetItem = mediaItems[mediaIndex];
-    
-    if (!targetItem) return;
-    
+  function switchToMedia(index) {
     // Update active states
-    mediaItems.forEach(item => item.style.display = 'none');
-    thumbnails.forEach(thumb => thumb.classList.remove('active'));
+    mediaItems.forEach((item, i) => {
+      item.style.display = i === index ? 'block' : 'none';
+      item.classList.toggle('active', i === index);
+    });
     
-    targetItem.style.display = 'block';
-    thumbnails[mediaIndex].classList.add('active');
+    thumbnails.forEach((thumb, i) => {
+      thumb.classList.toggle('active', i === index);
+    });
     
-    // Handle variant synchronization
-    const variantId = targetItem.dataset.variantId;
-    if (variantId && window.updateVariantFromMedia) {
-      window.updateVariantFromMedia(variantId);
-    }
+    // Update main container
+    mainContainer.setAttribute('data-media-index', index);
     
-    // Setup video if needed
-    const video = targetItem.querySelector('.direct-video');
+    // Handle video playback
+    const activeMedia = mediaItems[index];
+    const video = activeMedia?.querySelector('.direct-video');
+    
     if (video) {
-      setupVideoHandlers(video);
-    }
-    
-    currentMediaIndex = mediaIndex;
-    
-    // Trigger custom event
-    gallery.dispatchEvent(new CustomEvent('mediaChange', {
-      detail: {
-        mediaIndex: mediaIndex,
-        mediaType: targetItem.dataset.mediaType,
-        variantId: variantId
-      }
-    }));
-  }
-  
-  function setupVideoHandlers(video) {
-    video.addEventListener('loadstart', function() {
-      this.closest('.media-item').classList.add('loading');
-    });
-    
-    video.addEventListener('canplay', function() {
-      this.closest('.media-item').classList.remove('loading');
-    });
-    
-    video.addEventListener('error', function() {
-      console.warn('Video failed to load:', this.src);
-      this.closest('.media-item').classList.remove('loading');
-    });
-  }
-  
-  function handleKeyboardNavigation(e) {
-    if (e.key === 'ArrowLeft') {
-      e.preventDefault();
-      const prevIndex = currentMediaIndex > 0 ? currentMediaIndex - 1 : thumbnails.length - 1;
-      switchToMedia(prevIndex);
-    } else if (e.key === 'ArrowRight') {
-      e.preventDefault();
-      const nextIndex = currentMediaIndex < thumbnails.length - 1 ? currentMediaIndex + 1 : 0;
-      switchToMedia(nextIndex);
-    }
-  }
-  
-  // Expose gallery update function for variant synchronization
-  window.updateMediaGallery = function(variantId) {
-    const associatedThumb = gallery.querySelector(`[data-variant-id*="${variantId}"]`);
-    if (associatedThumb) {
-      const mediaIndex = Array.from(thumbnails).indexOf(associatedThumb);
-      if (mediaIndex !== -1) {
-        switchToMedia(mediaIndex);
+      // Pause other videos
+      mediaItems.forEach((item, i) => {
+        if (i !== index) {
+          const otherVideo = item.querySelector('.direct-video');
+          if (otherVideo && !otherVideo.paused) {
+            otherVideo.pause();
+          }
+        }
+      });
+      
+      // Load video if not already loaded
+      if (!video.hasAttribute('data-loaded')) {
+        video.load();
+        video.setAttribute('data-loaded', 'true');
       }
     }
-  };
+  }
   
-  // Auto-play first video after a delay
-  setTimeout(() => {
-    const firstVideo = mainContainer.querySelector('.direct-video');
-    if (firstVideo && !firstVideo.paused) {
-      // Don't auto-play, let user control
+  function initializeVideos() {
+    const videos = gallery.querySelectorAll('.direct-video');
+    videos.forEach(video => {
+      // Add loading event listeners
+      video.addEventListener('loadstart', () => {
+        video.style.opacity = '0.7';
+      });
+      
+      video.addEventListener('canplay', () => {
+        video.style.opacity = '1';
+        video.setAttribute('data-loaded', 'true');
+      });
+      
+      video.addEventListener('error', () => {
+        console.warn('Video failed to load:', video.src);
+        video.style.opacity = '0.5';
+      });
+    });
+  }
+  
+  function handleVariantChange(event) {
+    let variantId = null;
+    
+    // Handle different event types
+    if (event.detail?.variant) {
+      variantId = event.detail.variant.id.toString();
+    } else if (event.detail?.variantId) {
+      variantId = event.detail.variantId.toString();
     }
-  }, 1000);
-<<<<<<< HEAD
-  });
-  </script>
-=======
-});
-</script> 
->>>>>>> 3826508a52e0f0338250c93f86b00d4f80323a85
+    
+    if (!variantId) return;
+    
+    console.log('🎬 Gallery handling variant change:', variantId);
+    
+    // Find media associated with this variant
+    const variantMedia = Array.from(mediaItems).find(item => {
+      const variantIds = item.getAttribute('data-variant-id')?.split(',') || [];
+      return variantIds.includes(variantId);
+    });
+    
+    if (variantMedia) {
+      const mediaIndex = parseInt(variantMedia.getAttribute('data-media-index'));
+      console.log('🎬 Switching to media index:', mediaIndex);
+      switchToMedia(mediaIndex);
+    } else {
+      // If no specific media for variant, show featured media
+      const featuredMedia = mediaItems[0];
+      if (featuredMedia) {
+        console.log('🎬 No variant-specific media, showing featured');
+        switchToMedia(0);
+      }
+    }
+  }
+  
+  // Initialize when DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initGallery);
+  } else {
+    initGallery();
+  }
+})();
+</script>

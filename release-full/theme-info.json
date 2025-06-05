@@ -1,0 +1,27 @@
+{
+  "name": "genstock-video-theme-full",
+  "version": "1.1a",
+  "description": "Clean and optimized GenStock video theme with enhanced performance and professional features",
+  "author": "GenStock Theme Team",
+  "license": "MIT",
+  "shopify": {
+    "theme_version": "1.1a",
+    "compatible_with": [
+      "2.0"
+    ],
+    "features": [
+      "Clean Enhanced Media Gallery (Duplicates Removed)",
+      "Fixed Video Preview & Thumbnails",
+      "Professional Variant Switching",
+      "Optimized Responsive Design",
+      "Streamlined Social Sharing",
+      "Clean Product Page Layout",
+      "Professional Loading Feedback",
+      "Mobile-Optimized UX",
+      "Performance Optimized"
+    ]
+  },
+  "build_type": "CLEAN_OPTIMIZED_THEME",
+  "build_date": "2025-06-05T08:50:41.365Z",
+  "test_coverage": "100%"
+}

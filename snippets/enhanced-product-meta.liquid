@@ -603,6 +603,47 @@
   display: table;
   clear: both;
 }
+
+/* Variant Loading Indicator */
+.variant-loading {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: rgba(59, 130, 246, 0.95);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 50px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  z-index: 1000;
+  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4);
+  backdrop-filter: blur(10px);
+  transform: translateY(-100px);
+  opacity: 0;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.variant-loading.show {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.variant-loading-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top: 2px solid white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
 </style>
 
 <script>
@@ -611,21 +652,92 @@ document.addEventListener('DOMContentLoaded', function() {
   if (!productMeta) return;
   
   const variantCards = productMeta.querySelectorAll('.variant-card');
+  const productForm = document.querySelector('[data-type="add-to-cart-form"]');
+  const variantSelectors = document.querySelectorAll('variant-radios, variant-selects, select[name*="options"], input[name*="options"]');
   
-  // Listen for variant changes
-  document.addEventListener('change', function(e) {
-    if (e.target.name === 'id' || e.target.closest('variant-radios, variant-selects')) {
-      updateActiveVariantCard(e.target.value);
-    }
-  });
+  // Create unified variant synchronization system
+  function createVariantSync() {
+    // Listen for variant card clicks
+    variantCards.forEach(card => {
+      card.addEventListener('click', function(e) {
+        e.preventDefault();
+        const variantId = this.getAttribute('data-variant-id');
+        if (variantId) {
+          selectVariant(variantId, 'card');
+        }
+      });
+    });
+    
+    // Listen for built-in variant selector changes
+    document.addEventListener('change', function(e) {
+      if (e.target.name === 'id' || e.target.closest('variant-radios, variant-selects') || e.target.name && e.target.name.includes('options')) {
+        // Get the selected variant ID
+        const form = e.target.closest('form');
+        if (form) {
+          const formData = new FormData(form);
+          const product = window.product || {};
+          
+          if (product.variants) {
+            // Find matching variant based on selected options
+            const selectedVariant = findVariantByOptions(product.variants, formData);
+            if (selectedVariant) {
+              selectVariant(selectedVariant.id.toString(), 'selector');
+            }
+          }
+        }
+      }
+    });
+    
+    // Listen for programmatic variant changes
+    document.addEventListener('variant:change', function(e) {
+      if (e.detail && e.detail.variant) {
+        selectVariant(e.detail.variant.id.toString(), 'program');
+      }
+    });
+  }
   
-  document.addEventListener('variant:change', function(e) {
-    if (e.detail && e.detail.variant) {
-      updateActiveVariantCard(e.detail.variant.id);
-    }
-  });
+  function selectVariant(variantId, source) {
+    console.log(`🔄 Variant change from ${source}:`, variantId);
+    
+    // Show loading indicator
+    showVariantLoading('Switching variant...');
+    
+    // Small delay to ensure smooth animation
+    setTimeout(() => {
+      // Update variant cards
+      updateVariantCards(variantId);
+      
+      // Update built-in selectors if change didn't come from them
+      if (source !== 'selector') {
+        updateBuiltInSelectors(variantId);
+      }
+      
+      // Update form hidden input
+      updateFormVariantId(variantId);
+      
+      // Trigger gallery update
+      triggerGalleryUpdate(variantId);
+      
+      // Update price and availability
+      updateProductInfo(variantId);
+      
+      // Dispatch unified variant change event
+      const variant = findVariantById(variantId);
+      if (variant) {
+        document.dispatchEvent(new CustomEvent('variant:change', {
+          detail: { variant: variant },
+          bubbles: true
+        }));
+      }
+      
+      // Hide loading indicator after a brief delay
+      setTimeout(() => {
+        hideVariantLoading();
+      }, 300);
+    }, 50);
+  }
   
-  function updateActiveVariantCard(variantId) {
+  function updateVariantCards(variantId) {
     variantCards.forEach(card => {
       const cardVariantId = card.getAttribute('data-variant-id');
       if (cardVariantId == variantId) {
@@ -636,10 +748,201 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
   
+  function updateBuiltInSelectors(variantId) {
+    const variant = findVariantById(variantId);
+    if (!variant) return;
+    
+    // Update option selectors
+    variant.options.forEach((option, index) => {
+      const selector = document.querySelector(`select[name="options[${getOptionName(index)}]"]`);
+      if (selector) {
+        selector.value = option;
+        selector.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+      
+      // Update radio buttons
+      const radio = document.querySelector(`input[name="options[${getOptionName(index)}]"][value="${option}"]`);
+      if (radio) {
+        radio.checked = true;
+        radio.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+    });
+  }
+  
+  function updateFormVariantId(variantId) {
+    const hiddenInput = document.querySelector('input[name="id"]');
+    if (hiddenInput) {
+      hiddenInput.value = variantId;
+    }
+  }
+  
+  function triggerGalleryUpdate(variantId) {
+    // Dispatch multiple events for comprehensive gallery update
+    const variant = findVariantById(variantId);
+    
+    // Primary gallery event
+    const galleryEvent = new CustomEvent('gallery:variant-change', {
+      detail: { variantId: variantId, variant: variant },
+      bubbles: true
+    });
+    document.dispatchEvent(galleryEvent);
+    
+    // Legacy variant change event
+    const variantEvent = new CustomEvent('variant:change', {
+      detail: { variant: variant },
+      bubbles: true
+    });
+    document.dispatchEvent(variantEvent);
+    
+    // Direct media gallery update
+    const mediaGallery = document.querySelector('.direct-media-gallery');
+    if (mediaGallery) {
+      const mediaItems = mediaGallery.querySelectorAll('.media-item');
+      const thumbnails = mediaGallery.querySelectorAll('.thumbnail-item');
+      
+      // Find media for this variant
+      let targetIndex = 0;
+      mediaItems.forEach((item, index) => {
+        const variantIds = item.getAttribute('data-variant-id')?.split(',') || [];
+        if (variantIds.includes(variantId.toString())) {
+          targetIndex = index;
+        }
+      });
+      
+      // Update active states
+      mediaItems.forEach((item, index) => {
+        if (index === targetIndex) {
+          item.style.display = 'block';
+          item.classList.add('active');
+        } else {
+          item.style.display = 'none';
+          item.classList.remove('active');
+        }
+      });
+      
+      thumbnails.forEach((thumb, index) => {
+        if (index === targetIndex) {
+          thumb.classList.add('active');
+        } else {
+          thumb.classList.remove('active');
+        }
+      });
+      
+      console.log('🎬 Gallery updated to show media index:', targetIndex, 'for variant:', variantId);
+    }
+  }
+  
+  function updateProductInfo(variantId) {
+    const variant = findVariantById(variantId);
+    if (!variant) return;
+    
+    // Update price
+    const priceElements = document.querySelectorAll('.price, .current-price, .price--large');
+    priceElements.forEach(el => {
+      if (variant.price !== undefined) {
+        el.textContent = formatMoney(variant.price);
+      }
+    });
+    
+    // Update availability
+    const addToCartButton = document.querySelector('.product-form__cart-submit, [name="add"]');
+    if (addToCartButton) {
+      const buttonText = addToCartButton.querySelector('.btn-text') || addToCartButton;
+      if (variant.available) {
+        addToCartButton.disabled = false;
+        addToCartButton.classList.remove('disabled');
+        buttonText.textContent = addToCartButton.getAttribute('data-add-to-cart-text') || 'Add to Cart';
+      } else {
+        addToCartButton.disabled = true;
+        addToCartButton.classList.add('disabled');
+        buttonText.textContent = 'Sold Out';
+      }
+    }
+  }
+  
+  function findVariantById(variantId) {
+    const product = window.product || {};
+    if (product.variants) {
+      return product.variants.find(v => v.id.toString() === variantId.toString());
+    }
+    return null;
+  }
+  
+  function findVariantByOptions(variants, formData) {
+    const selectedOptions = [];
+    for (let i = 0; i < 3; i++) {
+      const optionName = getOptionName(i);
+      const value = formData.get(`options[${optionName}]`);
+      if (value) {
+        selectedOptions[i] = value;
+      }
+    }
+    
+    return variants.find(variant => {
+      return variant.options.every((option, index) => {
+        return !selectedOptions[index] || selectedOptions[index] === option;
+      });
+    });
+  }
+  
+  function getOptionName(index) {
+    const product = window.product || {};
+    if (product.options && product.options[index]) {
+      return product.options[index];
+    }
+    return `option${index + 1}`;
+  }
+  
+  function formatMoney(cents) {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 2
+    }).format(cents / 100);
+  }
+  
+  function showVariantLoading(message = 'Updating...') {
+    let loadingIndicator = document.querySelector('.variant-loading');
+    if (!loadingIndicator) {
+      loadingIndicator = document.createElement('div');
+      loadingIndicator.className = 'variant-loading';
+      loadingIndicator.innerHTML = `
+        <div class="variant-loading-spinner"></div>
+        <span class="loading-text">${message}</span>
+      `;
+      document.body.appendChild(loadingIndicator);
+    }
+    
+    const text = loadingIndicator.querySelector('.loading-text');
+    if (text) {
+      text.textContent = message;
+    }
+    
+    // Trigger animation
+    requestAnimationFrame(() => {
+      loadingIndicator.classList.add('show');
+    });
+  }
+  
+  function hideVariantLoading() {
+    const loadingIndicator = document.querySelector('.variant-loading');
+    if (loadingIndicator) {
+      loadingIndicator.classList.remove('show');
+      setTimeout(() => {
+        if (loadingIndicator.parentNode) {
+          loadingIndicator.parentNode.removeChild(loadingIndicator);
+        }
+      }, 300);
+    }
+  }
+  
+  // Initialize the synchronization system
+  createVariantSync();
+  
   // Set initial active state
-  const currentVariantInput = document.querySelector('input[name="id"]:checked, select[name="id"]');
-  if (currentVariantInput) {
-    updateActiveVariantCard(currentVariantInput.value);
+  const currentVariantInput = document.querySelector('input[name="id"]');
+  if (currentVariantInput && currentVariantInput.value) {
+    selectVariant(currentVariantInput.value, 'init');
   }
 });
 </script>
