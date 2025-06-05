@@ -50,6 +50,30 @@
   }
 }
 
+/* FORCE HORIZONTAL LAYOUT ON DESKTOP - FIX FOR VERTICAL STACKING */
+@media screen and (min-width: 990px) {
+  .collection-list.grid--4-col-desktop {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: var(--grid-desktop-horizontal-spacing) !important;
+  }
+  
+  .collection-list.grid--4-col-desktop .grid__item {
+    width: auto !important;
+    max-width: none !important;
+    margin: 0 !important;
+  }
+  
+  /* Additional responsive fixes */
+  .collection-list.grid--3-col-desktop {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+  
+  .collection-list.grid--2-col-desktop {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
 @media screen and (max-width: 989px) {
   .collection-list.slider .collection-list__item {
     max-width: 100%;
