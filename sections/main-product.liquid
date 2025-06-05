@@ -84,10 +84,15 @@
             <button 
               type="button" 
           class="buy-now-button btn-primary"
-          onclick="document.querySelector('.product-form__cart-submit').click()"
+          onclick="buyNowHandler()"
+          data-variant-id="{{ product.selected_or_first_available_variant.id }}"
+          data-product-id="{{ product.id }}"
         >
           <span class="buy-now-icon">⚡</span>
           <span class="buy-now-text">Buy Now - Instant Download</span>
+          <div class="buy-now-spinner" style="display: none;">
+            <div class="spinner"></div>
+          </div>
             </button>
 
         <div class="buy-now-features">
@@ -158,34 +163,77 @@
   
   /* Desktop Layout - Optimized for screen height */
   @media (min-width: 990px) {
-    .product-container {
-      grid-template-columns: 55% 43%;
-      gap: 2%;
-      padding: 0 1rem;
-      min-height: 85vh; /* Use viewport height for better screen optimization */
-      max-height: 90vh;
-      align-items: start;
-    }
-    
-.product-media {
-      width: 100%;
-      max-width: none;
-      height: fit-content;
-      max-height: 85vh;
-      overflow: auto;
-    }
-    
-.product-info {
-      width: 100%;
-      max-width: none;
+    .enhanced-product-section {
       padding: 1rem;
-      height: fit-content;
-      max-height: 85vh;
-  overflow-y: auto;
-      /* Custom scrollbar for better UX */
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+    }
+    
+    .product-container {
+      grid-template-columns: 58% 40%;
+      gap: 2%;
+      padding: 0;
+      height: 90vh;
+      max-height: 90vh;
+      align-items: stretch;
+      width: 100%;
+    }
+    
+    .product-media {
+      width: 100%;
+      height: 100%;
+      max-height: 90vh;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .product-info {
+      width: 100%;
+      height: 100%;
+      max-height: 90vh;
+      padding: 2rem 1.5rem;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      
+      /* Professional scrollbar */
       scrollbar-width: thin;
-      scrollbar-color: #cbd5e1 #f1f5f9;
-}
+      scrollbar-color: #cbd5e1 #f8fafc;
+    }
+    
+    /* Compact sections for better screen fit */
+    .product-header {
+      margin-bottom: 1rem;
+      flex-shrink: 0;
+    }
+    
+    .product-form-wrapper {
+      margin: 1rem 0;
+      flex-shrink: 0;
+    }
+    
+    .buy-now-section {
+      flex-shrink: 0;
+    }
+    
+    .trust-indicators {
+      flex-shrink: 0;
+    }
+    
+    .product-description {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+    }
+    
+    .social-sharing {
+      flex-shrink: 0;
+      margin-top: auto;
+    }
 
 .product-info::-webkit-scrollbar {
   width: 6px;
@@ -825,6 +873,84 @@
               bubbles: true
             }));
           }
+        }
+      }
+    });
+    
+    // Professional Buy Now Handler
+    window.buyNowHandler = function() {
+      const buyButton = document.querySelector('.buy-now-button');
+      const buttonText = buyButton.querySelector('.buy-now-text');
+      const buttonSpinner = buyButton.querySelector('.buy-now-spinner');
+      const variantId = buyButton.dataset.variantId;
+      
+      if (!variantId) {
+        console.error('No variant ID found for Buy Now button');
+        return;
+      }
+      
+      // Show loading state
+      buyButton.disabled = true;
+      buttonText.style.opacity = '0';
+      buttonSpinner.style.display = 'flex';
+      
+      // Add to cart
+      fetch('/cart/add.js', {
+        method: 'POST',
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          items: [{
+            id: parseInt(variantId),
+            quantity: 1
+          }]
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        // Success - redirect to checkout
+        buttonText.textContent = '✓ Redirecting to Checkout...';
+        buttonText.style.opacity = '1';
+        buttonSpinner.style.display = 'none';
+        
+        // Small delay for user feedback, then redirect
+        setTimeout(() => {
+          window.location.href = '/checkout';
+        }, 800);
+      })
+      .catch(error => {
+        console.error('Buy Now error:', error);
+        
+        // Error feedback
+        buttonText.textContent = 'Error - Try Again';
+        buyButton.style.background = 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)';
+        buttonText.style.opacity = '1';
+        buttonSpinner.style.display = 'none';
+        
+        // Reset after 3 seconds
+        setTimeout(() => {
+          buttonText.textContent = 'Buy Now - Instant Download';
+          buyButton.style.background = '';
+          buyButton.disabled = false;
+        }, 3000);
+      });
+    };
+    
+    // Update Buy Now button when variant changes
+    document.addEventListener('variant:change', function(event) {
+      const buyButton = document.querySelector('.buy-now-button');
+      if (buyButton && event.detail.variant) {
+        buyButton.dataset.variantId = event.detail.variant.id;
+        buyButton.disabled = !event.detail.variant.available;
+        
+        if (!event.detail.variant.available) {
+          buyButton.querySelector('.buy-now-text').textContent = 'Sold Out';
+          buyButton.style.background = 'linear-gradient(135deg, #9ca3af 0%, #6b7280 100%)';
+        } else {
+          buyButton.querySelector('.buy-now-text').textContent = 'Buy Now - Instant Download';
+          buyButton.style.background = '';
         }
       }
     });
