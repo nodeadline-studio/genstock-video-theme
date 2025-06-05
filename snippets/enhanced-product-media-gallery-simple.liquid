@@ -37,10 +37,12 @@
               <video 
                 class="direct-video"
                 controls 
-                preload="metadata"
+                autoplay
+                loop
+                muted
+                preload="auto"
                 playsinline
-                data-video-id="{{ media.id }}"
-                poster="{{ media.preview_image | image_url: width: 1200 }}">
+                data-video-id="{{ media.id }}">
                 <source src="{{ media.sources[0].url }}" type="video/mp4">
                 Your browser does not support video playback.
               </video>

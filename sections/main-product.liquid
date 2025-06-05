@@ -735,8 +735,8 @@
   // Product data for JavaScript
   window.product = {{ product | json }};
   
-  // Enhanced Product Form Handler v1.0
-  (function() {
+  // Enhanced Product Form Handler v1.0 - DOM Ready Wrapper
+  document.addEventListener('DOMContentLoaded', function() {
     'use strict';
     
     const productForm = document.querySelector('#product-form-{{ section.id }}');
@@ -954,7 +954,7 @@
         }
       }
     });
-  })();
+  });
 </script>
 
 {% schema %}
