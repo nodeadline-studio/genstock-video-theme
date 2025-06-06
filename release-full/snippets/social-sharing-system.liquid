@@ -1,0 +1,429 @@
+{%- comment -%}
+  Social Sharing System for GenStock Video
+  Includes proper previews, texts, and Open Graph data
+  Supports: Products, Collections, Store sharing
+{%- endcomment -%}
+
+{%- liquid
+  assign page_type = template.name
+  assign share_url = canonical_url | default: shop.url
+  assign share_title = page_title | default: shop.name
+  assign share_description = page_description | default: shop.description
+  assign share_image = ''
+  
+  case page_type
+    when 'product'
+      assign share_title = product.title | append: ' - ' | append: shop.name
+      assign share_description = product.description | strip_html | truncate: 160
+      if product.featured_image
+        assign share_image = product.featured_image | img_url: '1200x630'
+      endif
+      assign share_text = 'Check out this awesome video for creatives: ' | append: product.title | append: ' 🎬'
+      
+    when 'collection'
+      assign share_title = collection.title | append: ' - Video Collection | ' | append: shop.name
+      assign share_description = collection.description | strip_html | truncate: 160 | default: 'Professional videos for creative projects'
+      if collection.featured_image
+        assign share_image = collection.featured_image | img_url: '1200x630'
+      endif
+      assign share_text = 'Amazing video collection: ' | append: collection.title | append: ' 🎥 Perfect for projects!'
+      
+    else
+      assign share_title = shop.name | append: ' - Professional Videos for Creatives'
+      assign share_description = 'Huge library of high-quality videos for marketing, social media and creative projects'
+      assign share_image = settings.logo | img_url: '1200x630'
+      assign share_text = 'Found an amazing video store for creatives! 🎬 Tons of quality content for projects 🔥'
+  endcase
+  
+  if share_image == blank and settings.share_image
+    assign share_image = settings.share_image | img_url: '1200x630'
+  elsif share_image == blank
+    assign share_image = 'https://cdn.shopify.com/s/files/1/placeholder-image-1200x630.jpg'
+  endif
+-%}
+
+{%- comment -%} Open Graph Meta Tags {%- endcomment -%}
+<meta property="og:type" content="{% if page_type == 'product' %}product{% elsif page_type == 'collection' %}website{% else %}website{% endif %}">
+<meta property="og:title" content="{{ share_title | escape }}">
+<meta property="og:description" content="{{ share_description | escape }}">
+<meta property="og:url" content="{{ share_url }}">
+<meta property="og:image" content="{{ share_image }}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:site_name" content="{{ shop.name | escape }}">
+
+{%- if page_type == 'product' -%}
+  <meta property="product:price:amount" content="{{ product.price | money_without_currency }}">
+  <meta property="product:price:currency" content="{{ cart.currency.iso_code }}">
+  <meta property="product:availability" content="in stock">
+{%- endif -%}
+
+{%- comment -%} Twitter Cards {%- endcomment -%}
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ share_title | escape }}">
+<meta name="twitter:description" content="{{ share_description | escape }}">
+<meta name="twitter:image" content="{{ share_image }}">
+<meta name="twitter:url" content="{{ share_url }}">
+
+{%- comment -%} Telegram sharing optimization {%- endcomment -%}
+<meta property="telegram:channel" content="@genstock_video">
+
+<!-- Social Sharing Widget -->
+<div class="social-sharing" data-share-url="{{ share_url }}" data-share-title="{{ share_title | escape }}" data-share-text="{{ share_text | escape }}">
+  <div class="social-sharing__header">
+    <h3 class="social-sharing__title">
+      {% case page_type %}
+        {% when 'product' %}
+          🎬 Share Video
+        {% when 'collection' %}
+          🎥 Share Collection
+        {% else %}
+          🏪 Share Store
+      {% endcase %}
+    </h3>
+    <p class="social-sharing__subtitle">Send to friends or share on social media</p>
+  </div>
+  
+  <div class="social-sharing__buttons">
+    <!-- WhatsApp -->
+    <button class="social-btn social-btn--whatsapp" onclick="shareToWhatsApp()">
+      <svg viewBox="0 0 24 24" fill="currentColor">
+        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.890-5.335 11.893-11.893A11.821 11.821 0 0020.465 3.63"/>
+      </svg>
+      WhatsApp
+    </button>
+    
+    <!-- Telegram -->
+    <button class="social-btn social-btn--telegram" onclick="shareToTelegram()">
+      <svg viewBox="0 0 24 24" fill="currentColor">
+        <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
+      </svg>
+      Telegram
+    </button>
+    
+    <!-- VK -->
+    <button class="social-btn social-btn--vk" onclick="shareToVK()">
+      <svg viewBox="0 0 24 24" fill="currentColor">
+        <path d="M15.684 0H8.316C1.592 0 0 1.592 0 8.316v7.368C0 22.408 1.592 24 8.316 24h7.368C22.408 24 24 22.408 24 15.684V8.316C24 1.592 22.408 0 15.684 0zm3.692 17.123h-1.744c-.66 0-.862-.525-2.049-1.714-1.033-1.01-1.49-.856-1.49.235v1.714c-.097.484-.516.484-1.317.484-2.257 0-4.693-1.368-6.442-3.908C4.456 9.485 3.685 7.116 6.336 7.116c.957 0 1.31.097 1.31.097 1.31 1.464 1.464 3.39 2.257 1.712.33-.7 0-3.097-1.317-3.097-.66 0 .33-1.23 1.744-1.23 1.213 0 2.05.33 2.05 1.714v2.355c.33.33 1.02-.097 2.05-1.23 1.117-1.23 1.744-2.453 1.744-2.453.66-1.23 1.744-.66 1.744.33 0 .858-2.05 3.195-2.05 3.195 1.317 1.317 2.744 2.404 2.744 3.097 0 .856-.825 1.23-1.413 1.23z"/>
+      </svg>
+      VK
+    </button>
+    
+    <!-- Facebook -->
+    <button class="social-btn social-btn--facebook" onclick="shareToFacebook()">
+      <svg viewBox="0 0 24 24" fill="currentColor">
+        <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+      </svg>
+      Facebook
+    </button>
+    
+    <!-- Twitter -->
+    <button class="social-btn social-btn--twitter" onclick="shareToTwitter()">
+      <svg viewBox="0 0 24 24" fill="currentColor">
+        <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
+      </svg>
+      Twitter
+    </button>
+    
+    <!-- Copy Link -->
+    <button class="social-btn social-btn--copy" onclick="copyToClipboard()">
+      <svg viewBox="0 0 24 24" fill="currentColor">
+        <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+      </svg>
+      Copy Link
+    </button>
+  </div>
+  
+  <!-- Preview card -->
+  <div class="social-sharing__preview">
+    <div class="share-preview-card">
+      <div class="share-preview-card__image">
+        <img src="{{ share_image }}" alt="{{ share_title }}" loading="lazy">
+      </div>
+      <div class="share-preview-card__content">
+        <h4 class="share-preview-card__title">{{ share_title }}</h4>
+        <p class="share-preview-card__description">{{ share_description | truncate: 120 }}</p>
+        <span class="share-preview-card__url">{{ shop.domain }}</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.social-sharing {
+  background: white;
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  margin: 2rem 0;
+  border: 1px solid #f1f5f9;
+}
+
+.social-sharing__header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.social-sharing__title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 0.25rem;
+}
+
+.social-sharing__subtitle {
+  font-size: 0.875rem;
+  color: #64748b;
+  margin: 0;
+}
+
+.social-sharing__buttons {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.social-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: white;
+  text-decoration: none;
+}
+
+.social-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.social-btn--whatsapp {
+  background: #25D366;
+}
+
+.social-btn--whatsapp:hover {
+  background: #1da851;
+  transform: translateY(-1px);
+}
+
+.social-btn--telegram {
+  background: #0088cc;
+}
+
+.social-btn--telegram:hover {
+  background: #006699;
+  transform: translateY(-1px);
+}
+
+.social-btn--vk {
+  background: #0077ff;
+}
+
+.social-btn--vk:hover {
+  background: #0066cc;
+  transform: translateY(-1px);
+}
+
+.social-btn--facebook {
+  background: #1877f2;
+}
+
+.social-btn--facebook:hover {
+  background: #166fe5;
+  transform: translateY(-1px);
+}
+
+.social-btn--twitter {
+  background: #1da1f2;
+}
+
+.social-btn--twitter:hover {
+  background: #1a91da;
+  transform: translateY(-1px);
+}
+
+.social-btn--copy {
+  background: #6b7280;
+}
+
+.social-btn--copy:hover {
+  background: #4b5563;
+  transform: translateY(-1px);
+}
+
+.social-sharing__preview {
+  border-top: 1px solid #f1f5f9;
+  padding-top: 1.5rem;
+}
+
+.share-preview-card {
+  display: flex;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #f8fafc;
+}
+
+.share-preview-card__image {
+  width: 120px;
+  height: 90px;
+  flex-shrink: 0;
+}
+
+.share-preview-card__image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.share-preview-card__content {
+  padding: 1rem;
+  flex: 1;
+}
+
+.share-preview-card__title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0 0 0.5rem 0;
+  line-height: 1.3;
+}
+
+.share-preview-card__description {
+  font-size: 0.75rem;
+  color: #64748b;
+  margin: 0 0 0.5rem 0;
+  line-height: 1.4;
+}
+
+.share-preview-card__url {
+  font-size: 0.75rem;
+  color: #9ca3af;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .social-sharing__buttons {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .social-btn {
+    font-size: 0.75rem;
+    padding: 0.625rem 0.75rem;
+  }
+  
+  .share-preview-card {
+    flex-direction: column;
+  }
+  
+  .share-preview-card__image {
+    width: 100%;
+    height: 120px;
+  }
+}
+</style>
+
+<script>
+function shareToWhatsApp() {
+  const shareData = getSharingData();
+  const url = `https://wa.me/?text=${encodeURIComponent(shareData.text + ' ' + shareData.url)}`;
+  window.open(url, '_blank');
+}
+
+function shareToTelegram() {
+  const shareData = getSharingData();
+  const url = `https://t.me/share/url?url=${encodeURIComponent(shareData.url)}&text=${encodeURIComponent(shareData.text)}`;
+  window.open(url, '_blank');
+}
+
+function shareToVK() {
+  const shareData = getSharingData();
+  const url = `https://vk.com/share.php?url=${encodeURIComponent(shareData.url)}&title=${encodeURIComponent(shareData.title)}&description=${encodeURIComponent(shareData.text)}`;
+  window.open(url, '_blank');
+}
+
+function shareToFacebook() {
+  const shareData = getSharingData();
+  const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareData.url)}`;
+  window.open(url, '_blank');
+}
+
+function shareToTwitter() {
+  const shareData = getSharingData();
+  const url = `https://twitter.com/intent/tweet?url=${encodeURIComponent(shareData.url)}&text=${encodeURIComponent(shareData.text)}`;
+  window.open(url, '_blank');
+}
+
+function copyToClipboard() {
+  const shareData = getSharingData();
+  const textToCopy = `${shareData.text}\n${shareData.url}`;
+  
+  navigator.clipboard.writeText(textToCopy).then(() => {
+    showCopyNotification();
+  }).catch(() => {
+    // Fallback for older browsers
+    const textArea = document.createElement('textarea');
+    textArea.value = textToCopy;
+    document.body.appendChild(textArea);
+    textArea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textArea);
+    showCopyNotification();
+  });
+}
+
+function getSharingData() {
+  const shareElement = document.querySelector('.social-sharing');
+  return {
+    url: shareElement.getAttribute('data-share-url'),
+    title: shareElement.getAttribute('data-share-title'),
+    text: shareElement.getAttribute('data-share-text')
+  };
+}
+
+function showCopyNotification() {
+  const notification = document.createElement('div');
+  notification.textContent = '✅ Link copied!';
+  notification.style.cssText = `
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #10b981;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 500;
+    z-index: 1000;
+    animation: slideIn 0.3s ease;
+  `;
+  
+  document.body.appendChild(notification);
+  
+  setTimeout(() => {
+    notification.remove();
+  }, 3000);
+}
+
+// CSS animation for notification
+if (!document.querySelector('#copy-notification-styles')) {
+  const style = document.createElement('style');
+  style.id = 'copy-notification-styles';
+  style.textContent = `
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+  `;
+  document.head.appendChild(style);
+}
+</script> 

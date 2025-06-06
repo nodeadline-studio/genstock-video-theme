@@ -1,0 +1,88 @@
+.card__video-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  overflow: hidden;
+  border-radius: calc(var(--product-card-corner-radius) - var(--product-card-border-width) - var(--product-card-image-padding));
+  opacity: 0;
+  pointer-events: none;
+  will-change: opacity;
+  transition: opacity 0.2s ease-out;
+  transform: translateZ(0); /* Force hardware acceleration */
+}
+
+.card__video-container.playing {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.card__video-container video,
+.card__video-container iframe {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border: none;
+  transform: translateZ(0); /* Force hardware acceleration */
+}
+
+.card__media {
+  position: relative;
+  overflow: hidden; /* Prevent any overflow during transitions */
+}
+
+.card__media .media--hover-effect {
+  transition: opacity 0.15s ease-in-out;
+  will-change: opacity;
+  transform: translateZ(0); /* Force hardware acceleration */
+}
+
+.video-loading-spinner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 30px;
+  height: 30px;
+  border: 3px solid rgba(var(--color-foreground), 0.2);
+  border-top: 3px solid rgba(var(--color-foreground), 0.8);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  z-index: 10;
+}
+
+@keyframes spin {
+  0% { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* Prevent flickering during rapid hover events */
+.product-card-wrapper {
+  transform: translateZ(0); /* Force hardware acceleration */
+}
+
+/* Smooth transitions for touch devices */
+@media (hover: none) and (pointer: coarse) {
+  .card__video-container {
+    transition: opacity 0.3s ease-out;
+  }
+  
+  .card__media .media--hover-effect {
+    transition: opacity 0.2s ease-in-out;
+  }
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  .card__video-container,
+  .card__media .media--hover-effect {
+    transition: none;
+  }
+  
+  .video-loading-spinner {
+    animation: none;
+    border: 3px solid rgba(var(--color-foreground), 0.5);
+  }
+} 

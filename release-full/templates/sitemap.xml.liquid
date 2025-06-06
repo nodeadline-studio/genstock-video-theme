@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  
+  {%- comment -%} Homepage {%- endcomment -%}
+  <url>
+    <loc>{{ shop.url }}</loc>
+    <lastmod>{{ 'now' | date: '%Y-%m-%d' }}</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+  
+  {%- comment -%} Products {%- endcomment -%}
+  {%- for product in collections.all.products limit: 5000 -%}
+    {%- unless product.tags contains 'hidden' -%}
+      <url>
+        <loc>{{ shop.url }}{{ product.url }}</loc>
+        <lastmod>{{ product.updated_at | date: '%Y-%m-%d' }}</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+      </url>
+    {%- endunless -%}
+  {%- endfor -%}
+  
+  {%- comment -%} Collections {%- endcomment -%}
+  {%- for collection in collections -%}
+    {%- unless collection.handle == 'all' -%}
+      <url>
+        <loc>{{ shop.url }}{{ collection.url }}</loc>
+        <lastmod>{{ collection.updated_at | date: '%Y-%m-%d' }}</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.7</priority>
+      </url>
+    {%- endunless -%}
+  {%- endfor -%}
+  
+  {%- comment -%} Pages {%- endcomment -%}
+  {%- for page in pages -%}
+    <url>
+      <loc>{{ shop.url }}{{ page.url }}</loc>
+      <lastmod>{{ page.updated_at | date: '%Y-%m-%d' }}</lastmod>
+      <changefreq>monthly</changefreq>
+      <priority>0.6</priority>
+    </url>
+  {%- endfor -%}
+  
+  {%- comment -%} Blog posts {%- endcomment -%}
+  {%- for blog in blogs -%}
+    <url>
+      <loc>{{ shop.url }}{{ blog.url }}</loc>
+      <lastmod>{{ blog.updated_at | date: '%Y-%m-%d' }}</lastmod>
+      <changefreq>weekly</changefreq>
+      <priority>0.6</priority>
+    </url>
+    {%- for article in blog.articles limit: 1000 -%}
+      <url>
+        <loc>{{ shop.url }}{{ article.url }}</loc>
+        <lastmod>{{ article.updated_at | date: '%Y-%m-%d' }}</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.5</priority>
+      </url>
+    {%- endfor -%}
+  {%- endfor -%}
+  
+</urlset> 

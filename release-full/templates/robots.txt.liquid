@@ -1,0 +1,54 @@
+{%- comment -%} 
+  Custom robots.txt for GenStock Video - SEO Optimized
+  Allows indexing of all important content while blocking problematic URLs
+{%- endcomment -%}
+
+User-agent: *
+Allow: /
+
+{%- comment -%} Block tracking URLs that cause duplicate content {%- endcomment -%}
+Disallow: /*?wpm@*
+Disallow: /*?web-pixel-shopify-custom-pixel*
+Disallow: /*sandbox/modern*
+Disallow: /*${*
+Disallow: /*?pr_prod_strat=*
+Disallow: /*?pr_rec_id=*
+
+{%- comment -%} Standard Shopify blocks {%- endcomment -%}
+Disallow: /a/downloads/-/*
+Disallow: /admin
+Disallow: /cart
+Disallow: /orders
+Disallow: /checkouts/
+Disallow: /checkout
+Disallow: /carts
+Disallow: /account
+Disallow: /apps/
+Disallow: /.well-known/
+Disallow: /services/
+Disallow: /policies/refund-policy*?*
+Disallow: /policies/privacy-policy*?*
+Disallow: /policies/terms-of-service*?*
+
+{%- comment -%} Block query parameters that cause duplicate content {%- endcomment -%}
+Disallow: /*?*utm_source=*
+Disallow: /*?*utm_medium=*
+Disallow: /*?*utm_campaign=*
+Disallow: /*?*fbclid=*
+Disallow: /*?*gclid=*
+Disallow: /*?*ref=*
+
+{%- comment -%} Allow important crawling {%- endcomment -%}
+Allow: /products/
+Allow: /collections/
+Allow: /pages/
+Allow: /blogs/
+Allow: /policies/refund-policy$
+Allow: /policies/privacy-policy$
+Allow: /policies/terms-of-service$
+
+{%- comment -%} Crawl delay for better server performance {%- endcomment -%}
+Crawl-delay: 1
+
+{%- comment -%} Sitemap location {%- endcomment -%}
+Sitemap: {{ shop.url }}/sitemap.xml 

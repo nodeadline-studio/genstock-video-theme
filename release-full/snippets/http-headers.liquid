@@ -1,0 +1,77 @@
+{%- comment -%}
+  HTTP Headers for SEO and Security
+  This snippet adds important HTTP headers via meta tags
+{%- endcomment -%}
+
+{%- assign current_url = request.url | downcase -%}
+
+{%- comment -%} Add X-Robots-Tag equivalent via meta for problematic URLs {%- endcomment -%}
+{%- if current_url contains 'wpm@' or current_url contains 'web-pixel-shopify-custom-pixel' or current_url contains 'sandbox/modern' -%}
+  <meta http-equiv="X-Robots-Tag" content="noindex, nofollow, noarchive, nosnippet">
+{%- endif -%}
+
+{%- comment -%} Add cache control for better performance {%- endcomment -%}
+{%- if request.page_type == 'product' -%}
+  <meta http-equiv="Cache-Control" content="public, max-age=3600">
+{%- elsif request.page_type == 'collection' -%}
+  <meta http-equiv="Cache-Control" content="public, max-age=1800">
+{%- elsif request.page_type == 'index' -%}
+  <meta http-equiv="Cache-Control" content="public, max-age=900">
+{%- endif -%}
+
+{%- comment -%} Add security headers {%- endcomment -%}
+<meta http-equiv="X-Content-Type-Options" content="nosniff">
+<meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
+<meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+
+{%- comment -%} Add preconnect hints for performance {%- endcomment -%}
+<link rel="preconnect" href="https://cdn.shopify.com">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://www.google-analytics.com">
+
+{%- comment -%} DNS prefetch for external resources {%- endcomment -%}
+<link rel="dns-prefetch" href="//cdn.shopify.com">
+<link rel="dns-prefetch" href="//fonts.googleapis.com">
+<link rel="dns-prefetch" href="//www.googletagmanager.com">
+<link rel="dns-prefetch" href="//www.google-analytics.com">
+
+{%- comment -%} Add structured data for website {%- endcomment -%}
+{%- if request.page_type == 'index' -%}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "{{ shop.name | escape }}",
+  "url": "{{ shop.url }}",
+  "description": "{{ shop.description | strip_html | escape }}",
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": {
+      "@type": "EntryPoint",
+      "urlTemplate": "{{ shop.url }}/search?q={search_term_string}"
+    },
+    "query-input": "required name=search_term_string"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "{{ shop.name | escape }}",
+    "url": "{{ shop.url }}",
+    {% if settings.logo %}
+    "logo": {
+      "@type": "ImageObject",
+      "url": "{{ settings.logo | image_url: width: 600 }}",
+      "width": 600,
+      "height": 60
+    },
+    {% endif %}
+    "sameAs": [
+      {% if settings.social_facebook_link != blank %}"{{ settings.social_facebook_link }}",{% endif %}
+      {% if settings.social_twitter_link != blank %}"{{ settings.social_twitter_link }}",{% endif %}
+      {% if settings.social_instagram_link != blank %}"{{ settings.social_instagram_link }}",{% endif %}
+      {% if settings.social_youtube_link != blank %}"{{ settings.social_youtube_link }}",{% endif %}
+      {% if settings.social_linkedin_link != blank %}"{{ settings.social_linkedin_link }}"{% endif %}
+    ]
+  }
+}
+</script>
+{%- endif -%} 

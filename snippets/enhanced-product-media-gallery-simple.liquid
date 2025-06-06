@@ -438,9 +438,22 @@
     // Initialize videos
     initializeVideos();
     
-    // Handle variant changes - listen to both events
+    // Start from first video (index 1) instead of first image (index 0) on product pages
+    // Check if we're on a product page
+    const isProductPage = window.location.pathname.includes('/products/') || 
+                          document.body.classList.contains('template-product') ||
+                          document.querySelector('.product-form');
+    
+    if (isProductPage && mediaItems.length > 1) {
+      console.log('🎬 Product page detected - starting from first video (index 1)');
+      switchToMedia(1); // Start from index 1 (first video)
+    } else if (mediaItems.length > 0) {
+      console.log('🎬 Collection/Index page - starting from first image (index 0)');
+      switchToMedia(0); // Start from index 0 (first image)
+    }
+    
+    // Handle variant changes - single event listener to prevent duplicates
     document.addEventListener('variant:change', handleVariantChange);
-    document.addEventListener('gallery:variant-change', handleVariantChange);
   }
   
   function switchToMedia(index) {
@@ -525,11 +538,17 @@
       console.log('🎬 Switching to media index:', mediaIndex);
       switchToMedia(mediaIndex);
     } else {
-      // If no specific media for variant, show featured media
-      const featuredMedia = mediaItems[0];
-      if (featuredMedia) {
-        console.log('🎬 No variant-specific media, showing featured');
-        switchToMedia(0);
+      // If no specific media for variant, use appropriate fallback
+      const isProductPage = window.location.pathname.includes('/products/') || 
+                            document.body.classList.contains('template-product') ||
+                            document.querySelector('.product-form');
+      
+      if (isProductPage && mediaItems.length > 1) {
+        console.log('🎬 No variant-specific media, showing first video (index 1)');
+        switchToMedia(1); // Show first video on product pages
+      } else if (mediaItems.length > 0) {
+        console.log('🎬 No variant-specific media, showing first image (index 0)');
+        switchToMedia(0); // Show first image on collection pages
       }
     }
   }

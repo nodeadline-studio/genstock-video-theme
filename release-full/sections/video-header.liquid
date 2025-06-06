@@ -1,0 +1,495 @@
+{{ 'video-header-2025.css' | asset_url | stylesheet_tag }}
+
+{%- style -%}
+  .video-header-{{ section.id }} {
+    --header-height: {{ section.settings.header_height | default: 100 }}vh;
+    --overlay-opacity: {{ section.settings.overlay_opacity | default: 40 | divided_by: 100.0 }};
+    --text-color: {{ section.settings.text_color.red }}, {{ section.settings.text_color.green }}, {{ section.settings.text_color.blue }};
+    --button-bg-from: {{ section.settings.button_color_from }};
+    --button-bg-to: {{ section.settings.button_color_to }};
+    --accent-color: {{ section.settings.accent_color }};
+  }
+{%- endstyle -%}
+
+<div class="video-header video-header-{{ section.id }} color-{{ section.settings.color_scheme }}">
+  <!-- Background Video -->
+  <div class="video-header__background">
+    <video 
+      class="video-header__video"
+      autoplay 
+      muted 
+      loop 
+      playsinline
+      preload="metadata"
+    >
+      <source src="{{ section.settings.video_url | default: 'https://cdn.shopify.com/videos/c/o/v/d1cd51e96a7b49f4a08b7b513e375078.mp4' }}" type="video/mp4">
+    </video>
+    <div class="video-header__overlay"></div>
+  </div>
+
+  <!-- Content -->
+  <div class="video-header__content">
+    <div class="video-header__container page-width">
+      
+      <!-- Animated Badge -->
+      {%- if section.settings.show_badge and section.settings.badge_text != blank -%}
+        <div class="video-header__badge{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}">
+          <span class="badge-glow">{{ section.settings.badge_text }}</span>
+        </div>
+      {%- endif -%}
+
+      <!-- Main Headline -->
+      {%- if section.settings.heading != blank -%}
+        <h1 class="video-header__heading{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}"
+            {% if settings.animations_reveal_on_scroll %}data-cascade style="--animation-order: 1;"{% endif %}>
+          {{ section.settings.heading }}
+        </h1>
+      {%- endif -%}
+
+      <!-- Subheading -->
+      {%- if section.settings.subheading != blank -%}
+        <div class="video-header__subheading{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}"
+             {% if settings.animations_reveal_on_scroll %}data-cascade style="--animation-order: 2;"{% endif %}>
+          {{ section.settings.subheading }}
+        </div>
+      {%- endif -%}
+
+      <!-- CTA Buttons -->
+      <div class="video-header__buttons{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}"
+           {% if settings.animations_reveal_on_scroll %}data-cascade style="--animation-order: 3;"{% endif %}>
+        
+        <!-- Primary CTA -->
+        {%- if section.settings.button_label != blank -%}
+          <button 
+            class="video-header__cta-primary btn-2025"
+            onclick="smoothScrollToTarget('{{ section.settings.scroll_target | default: 'MainContent' }}')"
+            aria-label="{{ section.settings.button_label | escape }}"
+          >
+            <span class="btn-text">{{ section.settings.button_label }}</span>
+            <span class="btn-gradient"></span>
+            <span class="btn-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="m6 9 6 6 6-6"/>
+              </svg>
+            </span>
+          </button>
+        {%- endif -%}
+
+        <!-- Secondary CTA -->
+        {%- if section.settings.button_label_2 != blank -%}
+          <a 
+            href="{{ section.settings.button_link_2 | default: collections.all.url }}"
+            class="video-header__cta-secondary btn-2025-outline"
+          >
+            <span class="btn-text">{{ section.settings.button_label_2 }}</span>
+            <span class="btn-hover-bg"></span>
+          </a>
+        {%- endif -%}
+      </div>
+
+      <!-- Stats/Features -->
+      {%- if section.settings.show_stats -%}
+        <div class="video-header__stats{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}"
+             {% if settings.animations_reveal_on_scroll %}data-cascade style="--animation-order: 4;"{% endif %}>
+          
+          {%- if section.settings.stat_1_number != blank -%}
+            <div class="stat-item">
+              <div class="stat-number">{{ section.settings.stat_1_number }}</div>
+              <div class="stat-label">{{ section.settings.stat_1_label }}</div>
+            </div>
+          {%- endif -%}
+
+          {%- if section.settings.stat_2_number != blank -%}
+            <div class="stat-item">
+              <div class="stat-number">{{ section.settings.stat_2_number }}</div>
+              <div class="stat-label">{{ section.settings.stat_2_label }}</div>
+            </div>
+          {%- endif -%}
+
+          {%- if section.settings.stat_3_number != blank -%}
+            <div class="stat-item">
+              <div class="stat-number">{{ section.settings.stat_3_number }}</div>
+              <div class="stat-label">{{ section.settings.stat_3_label }}</div>
+            </div>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+
+    </div>
+  </div>
+
+  <!-- Scroll Indicator -->
+  {%- if section.settings.show_scroll_indicator -%}
+    <div class="video-header__scroll-indicator">
+      <div class="scroll-indicator" onclick="smoothScrollToTarget('{{ section.settings.scroll_target | default: 'MainContent' }}')">
+        <div class="scroll-indicator__mouse">
+          <div class="scroll-indicator__wheel"></div>
+        </div>
+        <div class="scroll-indicator__arrows">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </div>
+    </div>
+  {%- endif -%}
+</div>
+
+<script>
+// Enhanced smooth scroll function with better error handling
+function smoothScrollToTarget(targetId) {
+  try {
+    // Find target element
+    let target = document.getElementById(targetId) || 
+                 document.querySelector('[data-scroll-target]') ||
+                 document.querySelector('.main-content-target');
+    
+    if (!target) {
+      // Fallback: try to find any main content area
+      target = document.querySelector('main') || 
+               document.querySelector('.main-content') ||
+               document.querySelector('#MainContent') ||
+               document.querySelector('.shopify-section:not(.section-header):not(.video-header)');
+    }
+    
+    if (target) {
+      // Calculate position accounting for any headers or admin bars
+      const headerHeight = getHeaderHeight();
+      const adminBarHeight = getAdminBarHeight();
+      const targetPosition = target.offsetTop - headerHeight - adminBarHeight;
+      
+      // Smooth scroll with proper positioning
+      window.scrollTo({
+        top: Math.max(0, targetPosition),
+        behavior: 'smooth'
+      });
+    } else {
+      // Ultimate fallback: scroll by viewport height
+      window.scrollBy({
+        top: window.innerHeight * 0.8,
+        behavior: 'smooth'
+      });
+    }
+  } catch (error) {
+    console.log('Video header scroll: using fallback method');
+    window.scrollBy({
+      top: window.innerHeight * 0.8,
+      behavior: 'smooth'
+    });
+  }
+}
+
+// Get header height accounting for sticky headers
+function getHeaderHeight() {
+  const header = document.querySelector('.section-header') || 
+                 document.querySelector('.header') ||
+                 document.querySelector('header');
+  return header ? header.offsetHeight : 0;
+}
+
+// Get Shopify admin bar height
+function getAdminBarHeight() {
+  const adminBar = document.querySelector('#admin_bar_iframe') ||
+                   document.querySelector('.shopify-bar') ||
+                   document.querySelector('[data-shopify-admin-bar]');
+  return adminBar ? adminBar.offsetHeight : 0;
+}
+
+// Legacy function for backward compatibility
+function scrollToSection(targetId) {
+  smoothScrollToTarget(targetId);
+}
+
+// Video optimization and performance enhancements
+document.addEventListener('DOMContentLoaded', function() {
+  const video = document.querySelector('.video-header__video');
+  if (!video) return;
+
+  // Prevent video jumping and flickering
+  video.style.willChange = 'transform';
+  video.style.backfaceVisibility = 'hidden';
+
+  // Optimize video playback
+  video.addEventListener('loadeddata', function() {
+    if (video.readyState >= 3) {
+      video.play().catch(e => console.log('Video autoplay prevented'));
+    }
+  });
+
+  // Handle video visibility for performance
+  let isVideoVisible = true;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting && !isVideoVisible) {
+        video.play().catch(e => console.log('Video play prevented'));
+        isVideoVisible = true;
+      } else if (!entry.isIntersecting && isVideoVisible) {
+        video.pause();
+        isVideoVisible = false;
+      }
+    });
+  }, { 
+    threshold: 0.1,
+    rootMargin: '50px 0px'
+  });
+
+  observer.observe(video);
+
+  // Fix for Shopify admin bar positioning issues
+  function adjustForAdminBar() {
+    const videoHeader = document.querySelector('.video-header');
+    const adminBar = document.querySelector('#admin_bar_iframe') || 
+                     document.querySelector('.shopify-bar');
+    
+    if (videoHeader && adminBar && window.innerWidth >= 750) {
+      const adminBarHeight = adminBar.offsetHeight;
+      if (adminBarHeight > 0) {
+        videoHeader.style.marginTop = '0px';
+        videoHeader.style.position = 'relative';
+      }
+    }
+  }
+
+  // Run on load and when admin bar changes
+  adjustForAdminBar();
+  
+  // Watch for admin bar changes
+  const adminBarObserver = new MutationObserver(adjustForAdminBar);
+  const adminBar = document.querySelector('#admin_bar_iframe') || 
+                   document.querySelector('.shopify-bar') ||
+                   document.body;
+  
+  if (adminBar) {
+    adminBarObserver.observe(adminBar, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['style', 'class']
+    });
+  }
+
+  // Cleanup observers on page unload
+  window.addEventListener('beforeunload', function() {
+    if (observer) observer.disconnect();
+    if (adminBarObserver) adminBarObserver.disconnect();
+  });
+
+  // Fix any arrow animation conflicts
+  const videoHeaderElement = document.querySelector('.video-header');
+  if (videoHeaderElement) {
+    // Disable any existing arrow animations within video header
+    const arrows = videoHeaderElement.querySelectorAll('.icon-arrow, [class*="arrow"]');
+    arrows.forEach(arrow => {
+      arrow.style.animation = 'none';
+      arrow.style.transition = 'none';
+      const path = arrow.querySelector('path');
+      if (path) {
+        path.style.transform = 'none';
+        path.style.transition = 'none';
+      }
+    });
+  }
+});
+
+// Handle resize events
+window.addEventListener('resize', function() {
+  // Debounce resize handler
+  clearTimeout(window.videoHeaderResizeTimeout);
+  window.videoHeaderResizeTimeout = setTimeout(function() {
+    // Re-calculate positions if needed
+    const video = document.querySelector('.video-header__video');
+    if (video) {
+      video.style.willChange = 'transform';
+    }
+  }, 150);
+});
+</script>
+
+{% schema %}
+{
+  "name": "Video Header 2025",
+  "class": "section",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "header",
+      "content": "Video Settings"
+    },
+    {
+      "type": "url",
+      "id": "video_url",
+      "label": "Video URL (MP4)",
+      "info": "Upload video to Shopify files and use URL here"
+    },
+    {
+      "type": "range",
+      "id": "header_height",
+      "min": 50,
+      "max": 100,
+      "step": 5,
+      "unit": "vh",
+      "label": "Header Height",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "unit": "%",
+      "label": "Video Overlay Opacity",
+      "default": 40
+    },
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_badge",
+      "label": "Show Badge",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "badge_text",
+      "label": "Badge Text",
+      "default": "✨ New 2025 Collection"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Stories in Motion."
+    },
+    {
+      "type": "richtext",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "<p>Discover cinematic stock footage crafted for creators. From nature escapes to human drama — every clip is ready to elevate your content.</p>"
+    },
+    {
+      "type": "header",
+      "content": "Call to Action Buttons"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Primary Button Text",
+      "default": "Explore Collection"
+    },
+    {
+      "type": "text",
+      "id": "scroll_target",
+      "label": "Scroll Target ID",
+      "default": "MainContent",
+      "info": "ID of element to scroll to when primary button is clicked"
+    },
+    {
+      "type": "text",
+      "id": "button_label_2",
+      "label": "Secondary Button Text",
+      "default": "Browse All Videos"
+    },
+    {
+      "type": "url",
+      "id": "button_link_2",
+      "label": "Secondary Button Link"
+    },
+    {
+      "type": "header",
+      "content": "Stats/Features"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_stats",
+      "label": "Show Statistics",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "stat_1_number",
+      "label": "Statistic 1 Number",
+      "default": "10K+"
+    },
+    {
+      "type": "text",
+      "id": "stat_1_label",
+      "label": "Statistic 1 Label",
+      "default": "HD Videos"
+    },
+    {
+      "type": "text",
+      "id": "stat_2_number",
+      "label": "Statistic 2 Number",
+      "default": "4K"
+    },
+    {
+      "type": "text",
+      "id": "stat_2_label",
+      "label": "Statistic 2 Label",
+      "default": "Ultra Quality"
+    },
+    {
+      "type": "text",
+      "id": "stat_3_number",
+      "label": "Statistic 3 Number",
+      "default": "∞"
+    },
+    {
+      "type": "text",
+      "id": "stat_3_label",
+      "label": "Statistic 3 Label",
+      "default": "License"
+    },
+    {
+      "type": "header",
+      "content": "Design & Colors"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color Scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color",
+      "default": "#00d4ff"
+    },
+    {
+      "type": "color",
+      "id": "button_color_from",
+      "label": "Button Gradient Start",
+      "default": "#6366f1"
+    },
+    {
+      "type": "color",
+      "id": "button_color_to",
+      "label": "Button Gradient End",
+      "default": "#8b5cf6"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_scroll_indicator",
+      "label": "Show Scroll Indicator",
+      "default": true
+    }
+  ],
+  "presets": [
+    {
+      "name": "Video Header 2025"
+    }
+  ]
+}
+{% endschema %} 

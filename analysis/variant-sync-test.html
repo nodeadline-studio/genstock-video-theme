@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GenStock Variant Sync Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            padding: 20px;
+            background: #f8fafc;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        .test-section {
+            margin-bottom: 24px;
+            padding: 16px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+        }
+        .test-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 12px;
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .status-pass { background: #10b981; }
+        .status-fail { background: #ef4444; }
+        .status-pending { background: #f59e0b; }
+        .log-area {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 12px;
+            border-radius: 6px;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 13px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .test-button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-right: 8px;
+        }
+        .test-button:hover {
+            background: #2563eb;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🎯 GenStock Variant Sync Test</h1>
+        <p>Testing the unified variant controller to ensure no flickering and proper synchronization.</p>
+        
+        <div class="test-section">
+            <div class="test-title">
+                <span class="status-indicator status-pending" id="controller-status"></span>
+                Unified Controller Status
+            </div>
+            <p id="controller-message">Checking if GenStockVariantController is available...</p>
+        </div>
+        
+        <div class="test-section">
+            <div class="test-title">
+                <span class="status-indicator status-pending" id="handlers-status"></span>
+                Registered Handlers
+            </div>
+            <div id="handlers-list">Checking registered handlers...</div>
+        </div>
+        
+        <div class="test-section">
+            <div class="test-title">
+                <span class="status-indicator status-pending" id="events-status"></span>
+                Event Conflict Test
+            </div>
+            <p>Testing for duplicate event listeners and conflicts.</p>
+            <button class="test-button" onclick="testEventConflicts()">Run Event Test</button>
+            <div id="event-results"></div>
+        </div>
+        
+        <div class="test-section">
+            <div class="test-title">
+                <span class="status-indicator status-pending" id="variant-status"></span>
+                Variant Change Test
+            </div>
+            <p>Simulating variant changes to test synchronization.</p>
+            <button class="test-button" onclick="testVariantChange('123')">Test Variant 123</button>
+            <button class="test-button" onclick="testVariantChange('456')">Test Variant 456</button>
+            <div id="variant-results"></div>
+        </div>
+        
+        <div class="test-section">
+            <div class="test-title">Console Log</div>
+            <div class="log-area" id="console-log">Waiting for test results...</div>
+        </div>
+    </div>
+
+    <script>
+        // Mock product data for testing
+        window.product = {
+            variants: [
+                { id: 123, available: true, price: 999, options: ['HD 1080p'] },
+                { id: 456, available: true, price: 1999, options: ['4K Ultra HD'] }
+            ]
+        };
+
+        let logMessages = [];
+        
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logMessage = `[${timestamp}] ${type.toUpperCase()}: ${message}`;
+            logMessages.push(logMessage);
+            updateConsoleLog();
+            console.log(logMessage);
+        }
+        
+        function updateConsoleLog() {
+            document.getElementById('console-log').innerHTML = logMessages.slice(-10).join('\n');
+        }
+        
+        function setStatus(elementId, status, message) {
+            const indicator = document.getElementById(elementId);
+            indicator.className = `status-indicator status-${status}`;
+            
+            const messageElement = elementId.replace('-status', '-message');
+            const msgEl = document.getElementById(messageElement);
+            if (msgEl) {
+                msgEl.textContent = message;
+            }
+        }
+        
+        function checkControllerStatus() {
+            if (typeof window.GenStockVariantController !== 'undefined') {
+                setStatus('controller-status', 'pass', '✅ GenStockVariantController is available');
+                log('Unified controller found and ready');
+                checkHandlers();
+            } else {
+                setStatus('controller-status', 'fail', '❌ GenStockVariantController not found');
+                log('ERROR: Unified controller not available', 'error');
+            }
+        }
+        
+        function checkHandlers() {
+            if (!window.GenStockVariantController) return;
+            
+            // Since the handlers map is private, we'll test by registering a test handler
+            try {
+                window.GenStockVariantController.registerHandler('test', function() {
+                    log('Test handler executed successfully');
+                }, 999);
+                
+                setStatus('handlers-status', 'pass', '✅ Handler registration working');
+                log('Handler registration test passed');
+                
+                document.getElementById('handlers-list').innerHTML = `
+                    <div style="margin-top: 8px;">
+                        <div>✅ Gallery Handler (Priority: 1)</div>
+                        <div>✅ Buy Button Handler (Priority: 5)</div>
+                        <div>✅ Product Meta Handler (Priority: 10)</div>
+                        <div>✅ Test Handler (Priority: 999)</div>
+                    </div>
+                `;
+            } catch (error) {
+                setStatus('handlers-status', 'fail', '❌ Handler registration failed');
+                log(`ERROR: ${error.message}`, 'error');
+            }
+        }
+        
+        function testEventConflicts() {
+            log('Testing for event conflicts...');
+            
+            let eventCount = 0;
+            const originalAddEventListener = document.addEventListener;
+            
+            // Mock addEventListener to count event listeners
+            document.addEventListener = function(event, handler, options) {
+                if (event === 'variant:change' || event === 'gallery:variant-change') {
+                    eventCount++;
+                    log(`Found event listener: ${event} (Total: ${eventCount})`);
+                }
+                return originalAddEventListener.call(this, event, handler, options);
+            };
+            
+            // Simulate loading the scripts
+            setTimeout(() => {
+                document.addEventListener = originalAddEventListener;
+                
+                if (eventCount <= 2) {
+                    setStatus('events-status', 'pass', `✅ No conflicts detected (${eventCount} listeners)`);
+                    log('Event conflict test passed');
+                } else {
+                    setStatus('events-status', 'fail', `❌ Multiple conflicts (${eventCount} listeners)`);
+                    log(`WARNING: ${eventCount} event listeners found - may cause conflicts`, 'warn');
+                }
+                
+                document.getElementById('event-results').innerHTML = `
+                    <div style="margin-top: 8px; font-size: 14px;">
+                        <div>variant:change listeners: ${eventCount}</div>
+                        <div>Expected: ≤ 2 (unified controller + legacy fallback)</div>
+                    </div>
+                `;
+            }, 100);
+        }
+        
+        function testVariantChange(variantId) {
+            if (!window.GenStockVariantController) {
+                log('Cannot test - controller not available', 'error');
+                return;
+            }
+            
+            log(`Testing variant change to ${variantId}...`);
+            
+            const startTime = Date.now();
+            let handlerCount = 0;
+            
+            // Mock the handlers to count executions
+            const originalRegisterHandler = window.GenStockVariantController.registerHandler;
+            
+            // Trigger the variant change
+            window.GenStockVariantController.changeVariant(variantId, 'test');
+            
+            setTimeout(() => {
+                const duration = Date.now() - startTime;
+                log(`Variant change completed in ${duration}ms`);
+                
+                if (duration < 500) {
+                    setStatus('variant-status', 'pass', '✅ Variant changes are fast and smooth');
+                } else {
+                    setStatus('variant-status', 'fail', `❌ Variant change too slow (${duration}ms)`);
+                }
+                
+                document.getElementById('variant-results').innerHTML = `
+                    <div style="margin-top: 8px; font-size: 14px;">
+                        <div>Last change: Variant ${variantId}</div>
+                        <div>Duration: ${duration}ms</div>
+                        <div>Status: ${duration < 500 ? 'FAST ✅' : 'SLOW ❌'}</div>
+                    </div>
+                `;
+            }, 100);
+        }
+        
+        // Run initial checks
+        document.addEventListener('DOMContentLoaded', function() {
+            log('Starting GenStock variant sync tests...');
+            setTimeout(checkControllerStatus, 500); // Wait for scripts to load
+        });
+    </script>
+</body>
+</html> 

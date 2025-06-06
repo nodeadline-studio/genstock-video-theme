@@ -1,0 +1,1025 @@
+{% comment %}
+  Product Section v1.0 - CLEAN PROFESSIONAL LAYOUT
+  - Direct video gallery integration
+  - Streamlined variant switching
+  - Professional trust indicators
+  - Clean, focused design
+{% endcomment %}
+
+{{ 'component-product-variant-picker.css' | asset_url | stylesheet_tag }}
+{{ 'component-swatch.css' | asset_url | stylesheet_tag }}
+{{ 'component-swatch-input.css' | asset_url | stylesheet_tag }}
+
+<section id="MainProduct-{{ section.id }}" class="enhanced-product-section" data-section="{{ section.id }}">
+  <div class="product-container">
+    <!-- Media Gallery (60% desktop, 100% mobile) -->
+    <div class="product-media">
+      {% render 'enhanced-product-media-gallery-simple', product: product %}
+    </div>
+
+    <!-- Product Information Panel (40% desktop, 100% mobile) -->
+    <div class="product-info">
+      <div class="product-header">
+        <div class="product__title">
+          <h1>{{ product.title | escape }}</h1>
+        </div>
+        
+        <div class="product-price">
+          {%- render 'price', product: product, use_variant: true, show_badges: false, price_class: 'price--large' -%}
+        </div>
+      </div>
+      
+      <!-- Enhanced Product Meta with Variant Cards -->
+      {% render 'enhanced-product-meta', product: product %}
+
+      <!-- Product Form -->
+      <div class="product-form-wrapper">
+          {%- assign product_form_id = 'product-form-' | append: section.id -%}
+        {%- form 'product', product, id: product_form_id, class: 'form', novalidate: 'novalidate', data-type: 'add-to-cart-form' -%}
+          <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}" data-productid="{{ product.id }}">
+
+          {%- comment -%} 
+            Variant Selection Logic:
+            - Single variants: Use enhanced meta for display only
+            - Multiple variants: Use enhanced variant cards (no built-in dropdowns)
+            - Custom variant cards handle all selection logic
+          {%- endcomment -%}
+
+          <div class="product-form__buttons">
+            <button 
+              type="submit" 
+              name="add" 
+              class="product-form__cart-submit btn"
+              {%- if product.selected_or_first_available_variant.available == false -%}disabled{%- endif -%}>
+              <span class="btn-text">
+                {%- if product.selected_or_first_available_variant.available -%}
+                  {{ 'products.product.add_to_cart' | t }}
+            {%- else -%}
+                  {{ 'products.product.sold_out' | t }}
+            {%- endif -%}
+          </span>
+              <div class="loading-spinner" style="display: none;">
+                <div class="spinner"></div>
+        </div>
+            </button>
+
+            {%- if settings.enable_payment_button -%}
+              {{ form | payment_button }}
+      {%- endif -%}
+        </div>
+        {%- endform -%}
+                </div>
+                
+      <!-- Professional Description -->
+                {%- if product.description != blank -%}
+        <div class="product-description">
+          <div class="rte">
+                    {{ product.description }}
+                    </div>
+                  </div>
+                {%- endif -%}
+
+      <!-- Buy Now Button Section -->
+      <div class="buy-now-section">
+            <button 
+              type="button" 
+          class="buy-now-button btn-primary"
+          onclick="buyNowHandler()"
+          data-variant-id="{{ product.selected_or_first_available_variant.id }}"
+          data-product-id="{{ product.id }}"
+        >
+          <span class="buy-now-icon">⚡</span>
+          <span class="buy-now-text">Buy Now - Instant Download</span>
+          <div class="buy-now-spinner" style="display: none;">
+            <div class="spinner"></div>
+          </div>
+            </button>
+
+        <div class="buy-now-features">
+          <div class="feature-item">
+            <span class="feature-icon">💾</span>
+            <span class="feature-text">Instant HD Download</span>
+          </div>
+          <div class="feature-item">
+            <span class="feature-icon">📜</span>
+            <span class="feature-text">Commercial License</span>
+              </div>
+          <div class="feature-item">
+            <span class="feature-icon">🔒</span>
+            <span class="feature-text">Secure Checkout</span>
+            </div>
+          </div>
+      </div>
+
+      <!-- Essential Trust Indicators -->
+      <div class="trust-indicators">
+        <div class="trust-item">
+          <span class="trust-icon">⚡</span>
+          <span class="trust-text">Instant Download</span>
+        </div>
+        <div class="trust-item">
+          <span class="trust-icon">📄</span>
+          <span class="trust-text">Commercial License</span>
+        </div>
+        <div class="trust-item">
+          <span class="trust-icon">🔒</span>
+          <span class="trust-text">Secure Payment</span>
+        </div>
+        <div class="trust-item">
+          <span class="trust-icon">⭐</span>
+          <span class="trust-text">Premium Quality</span>
+        </div>
+      </div>
+
+      <!-- Social Sharing -->
+      <div class="social-sharing">
+        <h4 class="sharing-title">{{ 'general.social.share' | t }}</h4>
+        <div class="sharing-buttons">
+          {%- render 'share-button', share_url: request.origin | append: product.url, share_title: product.title -%}
+        </div>
+    </div>
+    </div>
+  </div>
+</section>
+
+<!-- Professional Video Store Styles 2025 - CLEAN VERSION -->
+<style>
+    /* ==========================================================================
+     RESPONSIVE LAYOUT SYSTEM
+       ========================================================================== */
+    
+.enhanced-product-section {
+    padding: 2rem 1rem;
+  background: #ffffff;
+}
+
+.product-container {
+  max-width: 1400px;
+  margin: 0 auto;
+    display: grid;
+    gap: 2rem;
+    grid-template-columns: 1fr;
+  }
+  
+  /* Desktop Layout - Optimized for screen height */
+  @media (min-width: 990px) {
+    .enhanced-product-section {
+      padding: 1rem;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+    }
+    
+    .product-container {
+      grid-template-columns: 58% 40%;
+      gap: 2%;
+      padding: 0;
+      height: 90vh;
+      max-height: 90vh;
+      align-items: stretch;
+      width: 100%;
+    }
+    
+    .product-media {
+      width: 100%;
+      height: 100%;
+      max-height: 90vh;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .product-info {
+      width: 100%;
+      height: 100%;
+      max-height: 90vh;
+      padding: 2rem 1.5rem;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      
+      /* Professional scrollbar */
+      scrollbar-width: thin;
+      scrollbar-color: #cbd5e1 #f8fafc;
+    }
+    
+    /* Compact sections for better screen fit */
+    .product-header {
+      margin-bottom: 1rem;
+      flex-shrink: 0;
+    }
+    
+    .product-form-wrapper {
+      margin: 1rem 0;
+      flex-shrink: 0;
+    }
+    
+    .buy-now-section {
+      flex-shrink: 0;
+    }
+    
+    .trust-indicators {
+      flex-shrink: 0;
+    }
+    
+    .product-description {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+    }
+    
+    .social-sharing {
+      flex-shrink: 0;
+      margin-top: auto;
+    }
+
+.product-info::-webkit-scrollbar {
+  width: 6px;
+}
+
+.product-info::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 3px;
+}
+
+.product-info::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+    .product-info::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+  }
+  
+  /* Ultra-wide screens optimization */
+  @media (min-width: 1400px) {
+    .product-container {
+      max-width: 1600px;
+      grid-template-columns: 60% 38%;
+      min-height: 80vh;
+    }
+    }
+    
+    /* ==========================================================================
+     TYPOGRAPHY & BRANDING
+       ========================================================================== */
+    
+  .product-header {
+    margin-bottom: 2rem;
+      }
+      
+      .product__title h1 {
+  font-size: 2rem;
+  font-weight: 700;
+    color: #1f2937;
+    margin: 0 0 1rem 0;
+    line-height: 1.3;
+      }
+      
+      .price--large {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: #059669;
+    display: block;
+    margin: 0;
+  }
+  
+  /* ==========================================================================
+     PRODUCT FORM & BUTTONS
+     ========================================================================== */
+  
+  .product-form-wrapper {
+    margin: 2rem 0;
+  }
+  
+  /* Variant Selector Styles */
+  .product-form__input {
+    margin-bottom: 1.5rem;
+  }
+  
+  .product-form__input--dropdown {
+    margin-bottom: 1.5rem;
+  }
+  
+  .form__label {
+    display: block;
+  font-weight: 600;
+    font-size: 1rem;
+  color: #374151;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  
+  .select {
+    position: relative;
+    display: block;
+  }
+  
+  .select__select {
+    width: 100%;
+    padding: 0.875rem 3rem 0.875rem 1rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+    background-color: #ffffff;
+  font-size: 1rem;
+    color: #374151;
+    appearance: none;
+    cursor: pointer;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  
+  .select__select:hover {
+    border-color: #d1d5db;
+  }
+  
+  .select__select:focus {
+  outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+  
+  .svg-wrapper {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: #6b7280;
+    width: 1rem;
+    height: 1rem;
+  }
+  
+  .svg-wrapper svg {
+        width: 100%;
+    height: 100%;
+  }
+  
+  .product-form__buttons {
+        display: flex;
+        flex-direction: column;
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+  
+  .product-form__cart-submit {
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    color: white;
+        border: none;
+    border-radius: 12px;
+    padding: 1.25rem 2rem;
+    font-size: 1.1rem;
+  font-weight: 600;
+    letter-spacing: 0.025em;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 14px rgba(59, 130, 246, 0.4);
+  cursor: pointer;
+    text-transform: uppercase;
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    /* Touch optimization */
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  .product-form__cart-submit:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.5);
+  }
+  
+  .product-form__cart-submit:active:not(:disabled) {
+    transform: translateY(0);
+    transition-duration: 0.1s;
+  }
+  
+  .product-form__cart-submit:disabled {
+    background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%);
+    color: #d1d5db;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+  }
+  
+  /* Loading spinner */
+  .loading-spinner {
+    position: absolute;
+    inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+    background: rgba(255, 255, 255, 0.1);
+  }
+  
+  .spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top: 2px solid white;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+    }
+    
+    /* ==========================================================================
+     PRODUCT DESCRIPTION
+       ========================================================================== */
+    
+  .product-description {
+    margin: 2rem 0;
+    padding: 1.5rem;
+    background: #f9fafb;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+  }
+  
+  .product-description .rte {
+    color: #374151;
+    line-height: 1.6;
+  }
+  
+  .product-description .rte p {
+        margin-bottom: 1rem;
+      }
+      
+  .product-description .rte ul,
+  .product-description .rte ol {
+    margin: 1rem 0;
+    padding-left: 1.5rem;
+  }
+  
+  .product-description .rte li {
+    margin-bottom: 0.5rem;
+  }
+  
+  /* ==========================================================================
+     BUY NOW SECTION
+     ========================================================================== */
+  
+  .buy-now-section {
+    margin: 2rem 0;
+    padding: 2rem;
+    background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 50%, #2563eb 100%);
+    border-radius: 16px;
+        text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .buy-now-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, transparent 50%, rgba(255,255,255,0.05) 100%);
+    pointer-events: none;
+  }
+  
+  .buy-now-button {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    color: white;
+    border: none;
+  border-radius: 12px;
+    padding: 1.25rem 2.5rem;
+    font-size: 1.2rem;
+    font-weight: 700;
+    letter-spacing: 0.025em;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 8px 25px rgba(245, 158, 11, 0.4);
+    cursor: pointer;
+    text-transform: uppercase;
+  display: flex;
+  align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+        width: 100%;
+    max-width: 400px;
+    margin: 0 auto 1.5rem auto;
+    position: relative;
+    z-index: 1;
+  }
+  
+  .buy-now-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 35px rgba(245, 158, 11, 0.6);
+    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  }
+  
+  .buy-now-icon {
+    font-size: 1.4rem;
+    animation: pulse 2s infinite;
+  }
+  
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+  }
+  
+  .buy-now-features {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+    margin-top: 1rem;
+  }
+  
+  .feature-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: white;
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+  
+  .feature-icon {
+    font-size: 1.1rem;
+  }
+  
+  @media (max-width: 767px) {
+    .buy-now-features {
+      flex-direction: column;
+      gap: 1rem;
+      align-items: center;
+    }
+  }
+  
+  /* ==========================================================================
+     TRUST INDICATORS
+     ========================================================================== */
+  
+  .trust-indicators {
+  display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin: 2rem 0;
+    padding: 1.5rem;
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    border-radius: 12px;
+    border: 1px solid #0ea5e9;
+  }
+  
+  .trust-item {
+  display: flex;
+  align-items: center;
+    gap: 0.75rem;
+  }
+  
+  .trust-icon {
+    font-size: 1.25rem;
+  }
+  
+  .trust-text {
+  font-weight: 600;
+    color: #0f172a;
+    font-size: 0.9rem;
+}
+
+  /* ==========================================================================
+     SOCIAL SHARING
+     ========================================================================== */
+  
+.social-sharing {
+    margin: 2rem 0;
+    padding: 1.5rem;
+    background: #ffffff;
+  border: 1px solid #e5e7eb;
+    border-radius: 12px;
+}
+
+.sharing-title {
+    font-size: 1.1rem;
+  font-weight: 600;
+    color: #374151;
+    margin: 0 0 1rem 0;
+}
+
+.sharing-buttons {
+  display: flex;
+    gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+  /* ==========================================================================
+     RESPONSIVE DESIGN
+     ========================================================================== */
+  
+  /* Tablets and up */
+  @media (min-width: 768px) {
+.enhanced-product-section {
+      padding: 3rem 2rem;
+}
+
+.product-container {
+  grid-template-columns: 60% 40%;
+      gap: 3rem;
+      align-items: start;
+    }
+    
+.product-info {
+      position: sticky;
+      top: 2rem;
+      max-height: calc(100vh - 4rem);
+  overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: #cbd5e1 transparent;
+}
+
+.product-info::-webkit-scrollbar {
+  width: 6px;
+}
+
+.product-info::-webkit-scrollbar-track {
+      background: transparent;
+}
+
+.product-info::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+    .trust-indicators {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  /* Large Desktop */
+  @media (min-width: 1200px) {
+  .enhanced-product-section {
+      padding: 4rem 2rem;
+  }
+  
+  .product-container {
+      gap: 4rem;
+    }
+    
+    .product__title h1 {
+      font-size: 2.5rem;
+    }
+    
+    .price--large {
+      font-size: 3rem;
+    }
+    
+    .trust-indicators {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+  
+  /* Mobile Optimizations */
+  @media (max-width: 767px) {
+    .enhanced-product-section {
+      padding: 1rem;
+    }
+    
+    .product-container {
+      gap: 1.5rem;
+    }
+    
+    .product__title h1 {
+    font-size: 1.5rem;
+  }
+  
+    .price--large {
+      font-size: 2rem;
+    }
+    
+    .product-form__buttons {
+      position: sticky;
+      bottom: 1rem;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      padding: 1rem;
+      margin: 0 -1rem;
+      border-radius: 12px 12px 0 0;
+      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+      z-index: 100;
+  }
+  
+  .trust-indicators {
+    grid-template-columns: 1fr;
+      gap: 0.75rem;
+    }
+    
+    .trust-item {
+      justify-content: center;
+  text-align: center;
+    }
+  }
+</style>
+
+<script src="{{ 'product-form.js' | asset_url }}" defer="defer"></script>
+<script src="{{ 'global.js' | asset_url }}" defer="defer"></script>
+
+{%- liquid
+  if product.selected_or_first_available_variant
+    assign current_variant = product.selected_or_first_available_variant
+  else
+    assign current_variant = product.variants[0]
+  endif
+-%}
+
+<script>
+  // Product data for JavaScript
+  window.product = {{ product | json }};
+  
+  // Enhanced Product Form Handler v1.0 - DOM Ready Wrapper
+  document.addEventListener('DOMContentLoaded', function() {
+    'use strict';
+    
+    const productForm = document.querySelector('#product-form-{{ section.id }}');
+    if (!productForm) return;
+    
+    const submitButton = productForm.querySelector('.product-form__cart-submit');
+    const buttonText = submitButton.querySelector('.btn-text');
+    const loadingSpinner = submitButton.querySelector('.loading-spinner');
+    
+    // Handle form submission with feedback
+    productForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      // Show loading state
+      submitButton.disabled = true;
+      buttonText.style.opacity = '0';
+      loadingSpinner.style.display = 'flex';
+      
+      // Create FormData from form
+      const formData = new FormData(productForm);
+      
+      // Submit to cart
+      fetch('/cart/add.js', {
+        method: 'POST',
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        // Success feedback
+        buttonText.textContent = '✓ Added to Cart!';
+        submitButton.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+        
+        // Trigger cart drawer if available
+        if (window.CartDrawer) {
+          window.CartDrawer.open();
+        }
+        
+        // Reset after 2 seconds
+        setTimeout(() => {
+          buttonText.textContent = '{{ 'products.product.add_to_cart' | t }}';
+          submitButton.style.background = '';
+          submitButton.disabled = false;
+          buttonText.style.opacity = '1';
+          loadingSpinner.style.display = 'none';
+        }, 2000);
+      })
+      .catch(error => {
+        console.error('Error adding to cart:', error);
+        
+        // Error feedback
+        buttonText.textContent = 'Error - Try Again';
+        submitButton.style.background = 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)';
+        
+        // Reset after 3 seconds
+        setTimeout(() => {
+          buttonText.textContent = '{{ 'products.product.add_to_cart' | t }}';
+          submitButton.style.background = '';
+          submitButton.disabled = false;
+          buttonText.style.opacity = '1';
+          loadingSpinner.style.display = 'none';
+        }, 3000);
+      });
+    });
+    
+    // Enhanced variant change handling
+    document.addEventListener('variant:change', function(event) {
+      if (!event.detail.variant) return;
+      
+      const variant = event.detail.variant;
+      const variantInput = productForm.querySelector('input[name="id"]');
+      
+      if (variantInput) {
+        variantInput.value = variant.id;
+      }
+      
+      // Update button state
+      if (variant.available) {
+        submitButton.disabled = false;
+        buttonText.textContent = '{{ 'products.product.add_to_cart' | t }}';
+        submitButton.style.background = '';
+      } else {
+        submitButton.disabled = true;
+        buttonText.textContent = '{{ 'products.product.sold_out' | t }}';
+        submitButton.style.background = 'linear-gradient(135deg, #9ca3af 0%, #6b7280 100%)';
+      }
+      
+      // Update price if available
+      if (variant.price !== undefined) {
+        const priceElements = document.querySelectorAll('.price--large');
+        priceElements.forEach(el => {
+          el.textContent = new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD'
+          }).format(variant.price / 100);
+        });
+      }
+    });
+    
+    // Handle form option changes for built-in variant selector
+    productForm.addEventListener('change', function(event) {
+      if (event.target.name && event.target.name.includes('options[')) {
+        // Get current form state
+        const formData = new FormData(productForm);
+        const product = window.product || {};
+        
+        if (product.variants) {
+          // Find matching variant
+          const selectedOptions = [];
+          for (let i = 0; i < 3; i++) {
+            const optionName = product.options ? product.options[i] : `option${i + 1}`;
+            const value = formData.get(`options[${optionName}]`);
+            if (value) selectedOptions[i] = value;
+          }
+          
+          const matchingVariant = product.variants.find(variant => {
+            return variant.options.every((option, index) => {
+              return !selectedOptions[index] || selectedOptions[index] === option;
+            });
+          });
+          
+          if (matchingVariant) {
+            // Update hidden input
+            const variantInput = productForm.querySelector('input[name="id"]');
+            if (variantInput) {
+              variantInput.value = matchingVariant.id;
+            }
+            
+            // Dispatch variant change event
+            document.dispatchEvent(new CustomEvent('variant:change', {
+              detail: { variant: matchingVariant },
+              bubbles: true
+            }));
+          }
+        }
+      }
+    });
+    
+    // Professional Buy Now Handler
+    window.buyNowHandler = function() {
+      const buyButton = document.querySelector('.buy-now-button');
+      const buttonText = buyButton.querySelector('.buy-now-text');
+      const buttonSpinner = buyButton.querySelector('.buy-now-spinner');
+      const variantId = buyButton.dataset.variantId;
+      
+      if (!variantId) {
+        console.error('No variant ID found for Buy Now button');
+        return;
+      }
+      
+      // Show loading state
+      buyButton.disabled = true;
+      buttonText.style.opacity = '0';
+      buttonSpinner.style.display = 'flex';
+      
+      // Add to cart
+      fetch('/cart/add.js', {
+        method: 'POST',
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          items: [{
+            id: parseInt(variantId),
+            quantity: 1
+          }]
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        // Success - redirect to checkout
+        buttonText.textContent = '✓ Redirecting to Checkout...';
+        buttonText.style.opacity = '1';
+        buttonSpinner.style.display = 'none';
+        
+        // Small delay for user feedback, then redirect
+        setTimeout(() => {
+          window.location.href = '/checkout';
+        }, 800);
+      })
+      .catch(error => {
+        console.error('Buy Now error:', error);
+        
+        // Error feedback
+        buttonText.textContent = 'Error - Try Again';
+        buyButton.style.background = 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)';
+        buttonText.style.opacity = '1';
+        buttonSpinner.style.display = 'none';
+        
+        // Reset after 3 seconds
+        setTimeout(() => {
+          buttonText.textContent = 'Buy Now - Instant Download';
+          buyButton.style.background = '';
+          buyButton.disabled = false;
+        }, 3000);
+      });
+    };
+    
+    // Update Buy Now button when variant changes
+    document.addEventListener('variant:change', function(event) {
+      const buyButton = document.querySelector('.buy-now-button');
+      if (buyButton && event.detail.variant) {
+        buyButton.dataset.variantId = event.detail.variant.id;
+        buyButton.disabled = !event.detail.variant.available;
+        
+        if (!event.detail.variant.available) {
+          buyButton.querySelector('.buy-now-text').textContent = 'Sold Out';
+          buyButton.style.background = 'linear-gradient(135deg, #9ca3af 0%, #6b7280 100%)';
+        } else {
+          buyButton.querySelector('.buy-now-text').textContent = 'Buy Now - Instant Download';
+          buyButton.style.background = '';
+        }
+      }
+    });
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Product Section v1.0",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "enable_video_looping",
+      "label": "Enable video looping",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_zoom",
+      "label": "Enable image zoom",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Media gallery"
+    },
+    {
+      "type": "select",
+      "id": "gallery_layout",
+      "label": "Desktop layout",
+      "options": [
+        {
+          "value": "stacked",
+          "label": "Stacked"
+        },
+        {
+          "value": "thumbnails_left",
+          "label": "Thumbnails left"
+        }
+      ],
+      "default": "thumbnails_left"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "variant_picker",
+      "name": "Variant picker",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "select",
+          "id": "picker_type",
+          "options": [
+            {
+              "value": "dropdown",
+              "label": "Dropdown"
+            },
+            {
+              "value": "button",
+              "label": "Pills"
+            }
+          ],
+          "default": "dropdown",
+          "label": "Type"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %} 

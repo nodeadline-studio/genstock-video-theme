@@ -1,0 +1,104 @@
+{%- comment -%}
+  404 Error Handler and Redirect Logic
+  This snippet helps prevent 404 errors and provides proper redirects
+{%- endcomment -%}
+
+{%- assign current_path = request.path -%}
+{%- assign current_url = request.url -%}
+
+{%- comment -%} Handle specific problematic paths {%- endcomment -%}
+{%- if template.name == '404' -%}
+  <script>
+    (function() {
+      const currentPath = window.location.pathname;
+      const currentUrl = window.location.href;
+      let redirectUrl = null;
+      
+      // Handle numeric paths (redirect to homepage)
+      if (/^\/\d+$/.test(currentPath)) {
+        redirectUrl = '/';
+      }
+      
+      // Handle variable paths like /${t}
+      else if (currentPath.includes('${') || currentPath.includes('}')) {
+        redirectUrl = '/';
+      }
+      
+      // Handle API-like paths
+      else if (currentPath.startsWith('/v1/') || currentPath.startsWith('/api/')) {
+        redirectUrl = '/';
+      }
+      
+      // Handle CDN paths
+      else if (currentPath.startsWith('/cdn')) {
+        redirectUrl = '/';
+      }
+      
+      // Handle WPM paths
+      else if (currentPath.startsWith('/wpm')) {
+        redirectUrl = '/';
+      }
+      
+      // Handle regex-like patterns in URLs
+      else if (currentPath.includes('*') || currentPath.includes('(') || currentPath.includes(')')) {
+        redirectUrl = '/';
+      }
+      
+      // Handle cart paths that shouldn't be indexed
+      else if (currentPath.includes('/cart/') && !currentPath.startsWith('/cart')) {
+        redirectUrl = '/cart';
+      }
+      
+      // Handle account logout paths
+      else if (currentPath.includes('/account/logout') && !currentPath.startsWith('/account/logout')) {
+        redirectUrl = '/account/login';
+      }
+      
+      // Handle specific error codes
+      else if (/^\/4\d{2}$/.test(currentPath)) {
+        redirectUrl = '/';
+      }
+      
+      // Handle single letter paths
+      else if (/^\/[a-z]$/.test(currentPath)) {
+        redirectUrl = '/';
+      }
+      
+      // Perform redirect if needed
+      if (redirectUrl) {
+        // Add noindex meta tag for current page
+        const metaRobots = document.createElement('meta');
+        metaRobots.name = 'robots';
+        metaRobots.content = 'noindex,nofollow';
+        document.head.appendChild(metaRobots);
+        
+        // Redirect after a short delay
+        setTimeout(function() {
+          window.location.replace(redirectUrl);
+        }, 1000);
+      }
+    })();
+  </script>
+{%- endif -%}
+
+{%- comment -%} Add structured data for 404 pages {%- endcomment -%}
+{%- if template.name == '404' -%}
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "Page Not Found",
+    "description": "The requested page could not be found.",
+    "url": "{{ request.origin }}{{ request.path }}",
+    "mainEntity": {
+      "@type": "Thing",
+      "name": "404 Error"
+    },
+    "isPartOf": {
+      "@type": "WebSite",
+      "name": "{{ shop.name | escape }}",
+      "url": "{{ shop.url }}"
+    }
+  }
+  </script>
+{%- endif -%} 

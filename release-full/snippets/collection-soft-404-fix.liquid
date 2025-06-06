@@ -1,0 +1,43 @@
+{%- comment -%}
+  Collection Soft 404 Fix
+  Handles empty collections to prevent soft 404 errors - CONSERVATIVE VERSION
+{%- endcomment -%}
+
+{%- if request.page_type == 'collection' and collection.products_count == 0 -%}
+  {%- comment -%} Only noindex if collection is genuinely empty and not a valid collection {%- endcomment -%}
+  {%- if collection.id == blank or collection.title == blank -%}
+    <meta name="robots" content="noindex,follow">
+    <meta name="googlebot" content="noindex,follow">
+  {%- else -%}
+    {%- comment -%} Valid collection but empty - allow indexing for future products {%- endcomment -%}
+    <meta name="robots" content="index,follow">
+  {%- endif -%}
+{%- endif -%}
+
+{%- comment -%} Handle specific collections that might be problematic {%- endcomment -%}
+{%- if request.page_type == 'collection' -%}
+  {%- assign problematic_collections = 'sci-fi,new-featured' | split: ',' -%}
+  {%- if problematic_collections contains collection.handle -%}
+    {%- comment -%} Add extra SEO signals for these collections {%- endcomment -%}
+    <meta name="description" content="{{ collection.description | strip_html | truncate: 160 | escape | default: 'Explore our ' | append: collection.title | append: ' collection at ' | append: shop.name | append: '. High-quality video content for your projects.' }}">
+    
+    {%- if collection.products_count == 0 -%}
+      <script>
+        // Log empty collection for debugging
+        console.log('Empty collection detected:', '{{ collection.handle }}');
+        
+        // Add temporary message for empty collections
+        document.addEventListener('DOMContentLoaded', function() {
+          const collectionContainer = document.querySelector('.collection');
+          if (collectionContainer && !collectionContainer.querySelector('.product-card')) {
+            const emptyMessage = document.createElement('div');
+            emptyMessage.className = 'collection-empty-message';
+            emptyMessage.style.cssText = 'text-align: center; padding: 2rem; background: #f8f9fa; border-radius: 8px; margin: 2rem 0;';
+            emptyMessage.innerHTML = '<h3>Collection Coming Soon</h3><p>We\'re working on adding amazing content to this collection. Check back soon!</p>';
+            collectionContainer.appendChild(emptyMessage);
+          }
+        });
+      </script>
+    {%- endif -%}
+  {%- endif -%}
+{%- endif -%} 

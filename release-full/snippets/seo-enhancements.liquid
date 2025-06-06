@@ -1,0 +1,149 @@
+{%- comment -%}
+  SEO Enhancements for GenStockVideo
+  This snippet provides additional structured data and meta tags for better Google indexing
+{%- endcomment -%}
+
+{%- comment -%} Organization Schema for better brand recognition {%- endcomment -%}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "{{ shop.name | escape }}",
+  "url": "{{ shop.url }}",
+  "logo": {
+    "@type": "ImageObject",
+    "url": "{{ shop.url | append: '/assets/logo.png' }}",
+    "width": "600",
+    "height": "60"
+  },
+  "sameAs": [
+    {%- if settings.social_facebook_link != blank -%}"{{ settings.social_facebook_link }}",{%- endif -%}
+    {%- if settings.social_twitter_link != blank -%}"{{ settings.social_twitter_link }}",{%- endif -%}
+    {%- if settings.social_instagram_link != blank -%}"{{ settings.social_instagram_link }}",{%- endif -%}
+    {%- if settings.social_youtube_link != blank -%}"{{ settings.social_youtube_link }}",{%- endif -%}
+    "{{ shop.url }}"
+  ],
+  "contactPoint": {
+    "@type": "ContactPoint",
+    "contactType": "customer service",
+    "email": "{{ shop.email }}",
+    "url": "{{ shop.url }}/pages/contact"
+  }
+}
+</script>
+
+{%- comment -%} WebSite Schema for better search box functionality {%- endcomment -%}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "{{ shop.name | escape }}",
+  "url": "{{ shop.url }}",
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": {
+      "@type": "EntryPoint",
+      "urlTemplate": "{{ shop.url }}/search?q={search_term_string}"
+    },
+    "query-input": "required name=search_term_string"
+  }
+}
+</script>
+
+{%- comment -%} Additional meta tags for better crawling {%- endcomment -%}
+<meta name="format-detection" content="telephone=no">
+<meta name="theme-color" content="#000000">
+<meta name="msapplication-TileColor" content="#000000">
+
+{%- comment -%} Preconnect to important domains {%- endcomment -%}
+<link rel="preconnect" href="https://cdn.shopify.com">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://www.google-analytics.com">
+
+{%- comment -%} DNS prefetch for performance {%- endcomment -%}
+<link rel="dns-prefetch" href="//cdn.shopify.com">
+<link rel="dns-prefetch" href="//fonts.googleapis.com">
+
+{%- comment -%} Additional structured data for specific page types {%- endcomment -%}
+{%- if template.name == 'index' -%}
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "@id": "{{ shop.url }}#webpage",
+    "url": "{{ shop.url }}",
+    "name": "{{ shop.name | escape }} - {{ shop.description | escape }}",
+    "description": "{{ shop.description | escape }}",
+    "publisher": {
+      "@type": "Organization",
+      "name": "{{ shop.name | escape }}"
+    },
+    "mainEntity": {
+      "@type": "ItemList",
+      "name": "Featured Products",
+      "numberOfItems": "{{ collections.frontpage.products.size | default: 0 }}"
+    }
+  }
+  </script>
+{%- endif -%}
+
+{%- comment -%} Breadcrumb structured data for better navigation {%- endcomment -%}
+{%- unless template.name == 'index' -%}
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "{{ shop.url }}"
+      }
+      {%- if template contains 'collection' -%}
+      ,{
+        "@type": "ListItem",
+        "position": 2,
+        "name": "{{ collection.title | escape }}",
+        "item": "{{ shop.url }}{{ collection.url | split: '?' | first }}"
+      }
+      {%- elsif template contains 'product' -%}
+      {%- if product.collections.first -%}
+      ,{
+        "@type": "ListItem",
+        "position": 2,
+        "name": "{{ product.collections.first.title | escape }}",
+        "item": "{{ shop.url }}{{ product.collections.first.url | split: '?' | first }}"
+      }
+      {%- endif -%}
+      ,{
+        "@type": "ListItem",
+        "position": {% if product.collections.first %}3{% else %}2{% endif %},
+        "name": "{{ product.title | escape }}",
+        "item": "{{ shop.url }}{{ product.url | split: '?' | first }}"
+      }
+      {%- elsif template contains 'page' -%}
+      ,{
+        "@type": "ListItem",
+        "position": 2,
+        "name": "{{ page.title | escape }}",
+        "item": "{{ shop.url }}{{ page.url | split: '?' | first }}"
+      }
+      {%- elsif template contains 'article' -%}
+      ,{
+        "@type": "ListItem",
+        "position": 2,
+        "name": "{{ blog.title | escape }}",
+        "item": "{{ shop.url }}{{ blog.url }}"
+      }
+      ,{
+        "@type": "ListItem",
+        "position": 3,
+        "name": "{{ article.title | escape }}",
+        "item": "{{ shop.url }}{{ article.url }}"
+      }
+      {%- endif -%}
+    ]
+  }
+  </script>
+{%- endunless -%} 

@@ -1,0 +1,98 @@
+{%- comment -%}
+  Video Header Integration Snippet
+  
+  Usage:
+  {% render 'video-header-integration' %}
+  
+  This snippet should be placed right after the video-header section
+  to provide smooth transition and scroll target functionality.
+{%- endcomment -%}
+
+<div class="video-header-transition">
+  <!-- Smooth transition element -->
+  <div class="transition-gradient"></div>
+  
+  <!-- Main content scroll target -->
+  <div id="MainContent" class="main-content-target" data-scroll-target>
+    <!-- This div acts as scroll target for the video header CTA button -->
+  </div>
+</div>
+
+<style>
+.video-header-transition {
+  position: relative;
+  z-index: 1;
+}
+
+.transition-gradient {
+  height: 100px;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(var(--color-background), 0.8) 50%,
+    rgba(var(--color-background), 1) 100%
+  );
+  margin-top: -100px;
+  position: relative;
+  z-index: 2;
+}
+
+.main-content-target {
+  position: relative;
+  z-index: 1;
+  padding-top: 2rem;
+}
+
+/* Mobile adjustments */
+@media screen and (max-width: 768px) {
+  .transition-gradient {
+    height: 80px;
+    margin-top: -80px;
+  }
+  
+  .main-content-target {
+    padding-top: 1rem;
+  }
+}
+
+/* Ensure proper stacking context */
+.video-header + .shopify-section {
+  position: relative;
+  z-index: 1;
+  background: rgba(var(--color-background), 1);
+}
+</style>
+
+{%- comment -%}
+  Smooth scroll enhancement script
+{%- endcomment -%}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Enhance scroll behavior for video header integration
+  const scrollTargets = document.querySelectorAll('[data-scroll-target]');
+  
+  scrollTargets.forEach(target => {
+    target.addEventListener('focus', function() {
+      // Ensure smooth focus behavior
+      this.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+
+  // Handle scroll indicator clicks
+  const scrollIndicator = document.querySelector('.video-header__scroll-indicator');
+  if (scrollIndicator) {
+    scrollIndicator.addEventListener('click', function() {
+      const target = document.getElementById('MainContent') || document.querySelector('[data-scroll-target]');
+      if (target) {
+        const headerHeight = document.querySelector('.section-header')?.offsetHeight || 0;
+        const targetPosition = target.offsetTop - headerHeight;
+        
+        window.scrollTo({
+          top: targetPosition,
+          behavior: 'smooth'
+        });
+      }
+    });
+  }
+});
+</script> 

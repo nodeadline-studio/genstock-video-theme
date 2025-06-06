@@ -1,0 +1,237 @@
+{%- comment -%}
+GenStock Video Bundle Name Fix Script
+Apply these standardized names to product metafields
+{%- endcomment -%}
+
+<script>
+// Recommended bundle name updates for GenStock Video products
+const bundleNameFixes = [
+  {
+    title: "Video Bundle (1080P + 4K)",
+    newSubtitle: "HD Video Bundle"
+  },
+  {
+    title: "Breezy Rustic Bench Meadow",
+    newSubtitle: "HD Video Bundle"
+  },
+  {
+    title: "Video Bundle (1080P + 4K)",
+    newSubtitle: "HD Video Bundle"
+  },
+  {
+    title: "Coastal Cliffs Lighthouse",
+    newSubtitle: "0.0"
+  },
+  {
+    title: "Video Bundle (1080P + 4K)",
+    newSubtitle: "HD Video Bundle"
+  },
+  {
+    title: "Colleagues in Business Meeting",
+    newSubtitle: "HD Video Bundle"
+  },
+  {
+    title: "Video Bundles (1080P",
+    newSubtitle: "HD Video Bundle"
+  },
+  {
+    title: "Couple Arguing at Living Room",
+    newSubtitle: "HD Video Bundle"
+  },
+  {
+    title: "Video Bundle (720P + 2K)",
+    newSubtitle: "HD Video Bundle"
+  },
+  {
+    title: "Desert Aerial Flight",
+    newSubtitle: "HD Video Bundle"
+  },
+  {
+    title: "Dragon Flights Towards Castle",
+    newSubtitle: "HD Video Bundle"
+  },
+  {
+    title: "Video Bundle (1080P + 4K)",
+    newSubtitle: "HD Video Bundle"
+  },
+  {
+    title: "Father and Child Walk",
+    newSubtitle: "HD Video Bundle"
+  },
+  {
+    title: "Video Bundles (1080P",
+    newSubtitle: "HD Video Bundle"
+  },
+  {
+    title: "Friends at Lakeside Sunset",
+    newSubtitle: "HD Video Bundle"
+  },
+  {
+    title: " 3840 x 2160 (MP4)",
+    newSubtitle: "HD Video Bundle"
+  },
+  {
+    title: "Video Bundles (1080P",
+    newSubtitle: "HD Video Bundle"
+  },
+  {
+    title: "Golden Forest River",
+    newSubtitle: "HD Video Bundle"
+  },
+  {
+    title: "Video Bundle (1080P + 4K)",
+    newSubtitle: "HD Video Bundle"
+  },
+  {
+    title: "Hi-Tech Urban Cityscape",
+    newSubtitle: "HD Video Bundle"
+  },
+  {
+    title: "Video Bundle (1080P + 4K)",
+    newSubtitle: "HD Video Bundle"
+  },
+  {
+    title: "Luxury Room Piano Play",
+    newSubtitle: "HD Video Bundle"
+  },
+  {
+    title: "Video Bundle (1080P + 4K)",
+    newSubtitle: "HD Video Bundle"
+  },
+  {
+    title: "Majestic Mountain Peaks",
+    newSubtitle: "HD Video Bundle"
+  },
+  {
+    title: "Video Bundle (1080P + 4K)",
+    newSubtitle: "HD Video Bundle"
+  },
+  {
+    title: "Man Reflecting by Window",
+    newSubtitle: "HD Video Bundle"
+  },
+  {
+    title: "Video Bundles (1080P + 4K)",
+    newSubtitle: "HD Video Bundle"
+  },
+  {
+    title: "Man Works with a Laptop",
+    newSubtitle: "HD Video Bundle"
+  },
+  {
+    title: "Office Interior",
+    newSubtitle: "HD Video Bundle"
+  },
+  {
+    title: "Modern Urban Cityscape",
+    newSubtitle: "HD Video Bundle"
+  },
+  {
+    title: "Video Bundle (1080P + 4K)",
+    newSubtitle: "HD Video Bundle"
+  },
+  {
+    title: "Mountain Peaks Sunrise",
+    newSubtitle: "HD Video Bundle"
+  },
+  {
+    title: "Video Bundle (1080P + 4K)",
+    newSubtitle: "HD Video Bundle"
+  },
+  {
+    title: "Night Sky Mountain View",
+    newSubtitle: "HD Video Bundle"
+  },
+  {
+    title: "Video Bundle (1080P + 4K)",
+    newSubtitle: "HD Video Bundle"
+  },
+  {
+    title: "Nighttime City Bokeh",
+    newSubtitle: "HD Video Bundle"
+  },
+  {
+    title: " 3840 x 2160 (MP4)",
+    newSubtitle: "HD Video Bundle"
+  },
+  {
+    title: "Video Bundles (1080P",
+    newSubtitle: "HD Video Bundle"
+  },
+  {
+    title: "Rocky Hiking Path",
+    newSubtitle: "HD Video Bundle"
+  },
+  {
+    title: "Video Bundle (1080P + 4K)",
+    newSubtitle: "HD Video Bundle"
+  },
+  {
+    title: "Rooftop Urban Cityscape Footage",
+    newSubtitle: "HD Video Bundle"
+  },
+  {
+    title: "Video Bundle (1080P + 4K)",
+    newSubtitle: "HD Video Bundle"
+  },
+  {
+    title: "Sci-Fi Fashionist Woman Cyberpunk",
+    newSubtitle: "HD Video Bundle"
+  },
+  {
+    title: "Video Bundle (1080P + 4K)",
+    newSubtitle: "HD Video Bundle"
+  },
+  {
+    title: "Sea Shore Sunset",
+    newSubtitle: "HD Video Bundle"
+  },
+  {
+    title: "Video Bundle (1080P + 4K)",
+    newSubtitle: "HD Video Bundle"
+  },
+  {
+    title: "Snow Forest Tracks Path",
+    newSubtitle: "HD Video Bundle"
+  },
+  {
+    title: "Video Bundle (1080P + 4K)",
+    newSubtitle: "HD Video Bundle"
+  },
+  {
+    title: "Students Studying in Library",
+    newSubtitle: "HD Video Bundle"
+  },
+  {
+    title: "Video Bundles (1080P",
+    newSubtitle: "HD Video Bundle"
+  },
+  {
+    title: "Video Bundle (1080P + 4K)",
+    newSubtitle: "HD Video Bundle"
+  },
+  {
+    title: "Woman Skimming on Beach",
+    newSubtitle: "HD Video Bundle"
+  },
+  {
+    title: "Video Bundle (720P + 2K)",
+    newSubtitle: "HD Video Bundle"
+  }
+];
+
+console.log('GenStock Bundle Name Fixes Ready:', bundleNameFixes.length);
+</script>
+
+{%- comment -%}
+Manual update instructions:
+1. Go to Shopify Admin > Products
+2. For each product listed above:
+   - Edit the product
+   - Update the "Product subtitle" metafield 
+   - Save the changes
+3. Test the updated display on your store
+
+Bulk update option:
+Use Shopify's bulk editor or API to apply these changes faster
+{%- endcomment -%}
