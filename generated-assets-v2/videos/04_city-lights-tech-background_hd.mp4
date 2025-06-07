@@ -1,0 +1,14 @@
+{
+  "product": "City Lights Tech Background",
+  "resolution": "1920x1080",
+  "duration": 5,
+  "fps": 30,
+  "watermark": {
+    "logo": "/Users/tommykuznets/Downloads/My Projects/Video-Stock/graphics/watermark_white_70opacity.png",
+    "position": "bottom-right",
+    "opacity": 0.7,
+    "size": "150x50"
+  },
+  "quality": "HD",
+  "format": "mp4"
+}

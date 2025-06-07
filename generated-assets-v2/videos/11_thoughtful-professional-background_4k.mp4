@@ -1,0 +1,14 @@
+{
+  "product": "Thoughtful Professional Background",
+  "resolution": "3520x2304",
+  "duration": 10,
+  "fps": 30,
+  "watermark": {
+    "logo": "/Users/tommykuznets/Downloads/My Projects/Video-Stock/graphics/watermark_white_70opacity.png",
+    "position": "bottom-right",
+    "opacity": 0.7,
+    "size": "150x50"
+  },
+  "quality": "4K",
+  "format": "mp4"
+}

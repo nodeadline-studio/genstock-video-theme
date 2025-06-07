@@ -1,0 +1,15 @@
+{
+  "name": "spotlight-mod-professional",
+  "version": "2.0.0",
+  "description": "Professional video marketplace theme with automated product generation",
+  "scripts": {
+    "video-automation": "node automation/video-product-automation.js",
+    "generate-products": "npm run video-automation",
+    "clean-assets": "rm -rf generated-assets-v2",
+    "theme-merge": "node automation/theme-merge-automation.js",
+    "theme-rollback": "node automation/theme-rollback.js"
+  },
+  "keywords": ["shopify", "theme", "video", "saas", "professional"],
+  "author": "SaaSBackgrounds",
+  "license": "MIT"
+} 

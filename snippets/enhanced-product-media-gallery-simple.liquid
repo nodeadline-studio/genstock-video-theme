@@ -10,13 +10,12 @@
 <div class="direct-media-gallery" data-product-id="{{ product.id }}">
   <!-- Main Media Display -->
   <div class="main-media-container" data-media-index="0">
-    {%- comment -%} Sort media to show videos first, then images {%- endcomment -%}
+    {%- comment -%} VIDEO-ONLY GALLERY: Only show videos, skip all images {%- endcomment -%}
     {%- assign video_media = product.media | where: 'media_type', 'video' -%}
-    {%- assign image_media = product.media | where: 'media_type', 'image' -%}
-    {%- assign other_media = product.media | where: 'media_type', 'external_video' -%}
-    {%- assign sorted_media = video_media | concat: image_media | concat: other_media -%}
+    {%- assign external_video_media = product.media | where: 'media_type', 'external_video' -%}
+    {%- assign video_only_media = video_media | concat: external_video_media -%}
     
-    {%- for media in sorted_media -%}
+    {%- for media in video_only_media -%}
       <div 
         class="media-item{% if forloop.first %} active{% endif %}" 
         data-media-index="{{ forloop.index0 }}"
@@ -89,10 +88,10 @@
   </div>
 
   <!-- Enhanced Thumbnails Row -->
-  {%- if product.media.size > 1 -%}
+  {%- if video_only_media.size > 1 -%}
     <div class="thumbnails-container">
       <div class="thumbnails-row">
-        {%- for media in sorted_media -%}
+        {%- for media in video_only_media -%}
           <button 
             class="thumbnail-item{% if forloop.first %} active{% endif %}"
             data-media-index="{{ forloop.index0 }}"

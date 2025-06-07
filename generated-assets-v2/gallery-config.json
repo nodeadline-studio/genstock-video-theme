@@ -1,0 +1,12 @@
+{
+  "videoFirst": true,
+  "skipFirstImage": true,
+  "showVideosOnly": true,
+  "hoverEffects": true,
+  "watermarkOverlay": true,
+  "aspectRatioPreservation": true,
+  "thumbnailSize": "720p",
+  "autoplay": false,
+  "controls": true,
+  "preload": "metadata"
+}
