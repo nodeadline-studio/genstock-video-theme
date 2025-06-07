@@ -10,9 +10,13 @@
 <div class="direct-media-gallery" data-product-id="{{ product.id }}">
   <!-- Main Media Display -->
   <div class="main-media-container" data-media-index="0">
-    {%- assign primary_media = product.selected_or_first_available_variant.featured_media | default: product.featured_media -%}
+    {%- comment -%} Sort media to show videos first, then images {%- endcomment -%}
+    {%- assign video_media = product.media | where: 'media_type', 'video' -%}
+    {%- assign image_media = product.media | where: 'media_type', 'image' -%}
+    {%- assign other_media = product.media | where: 'media_type', 'external_video' -%}
+    {%- assign sorted_media = video_media | concat: image_media | concat: other_media -%}
     
-    {%- for media in product.media -%}
+    {%- for media in sorted_media -%}
       <div 
         class="media-item{% if forloop.first %} active{% endif %}" 
         data-media-index="{{ forloop.index0 }}"
@@ -88,7 +92,7 @@
   {%- if product.media.size > 1 -%}
     <div class="thumbnails-container">
       <div class="thumbnails-row">
-        {%- for media in product.media -%}
+        {%- for media in sorted_media -%}
           <button 
             class="thumbnail-item{% if forloop.first %} active{% endif %}"
             data-media-index="{{ forloop.index0 }}"
